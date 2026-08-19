@@ -24,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>OfficeCli.McpContractTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Resources/preview.css" />
     <EmbeddedResource Include="Resources/preview.js" />
     <EmbeddedResource Include="Resources/watch-sse-core.js" />
