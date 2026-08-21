@@ -3,8 +3,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>OfficeCli.McpContractTests</AssemblyName>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-    <SelfContained>true</SelfContained>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -13,5 +11,13 @@
     <ProjectReference
       Include="../../src/officecli/officecli.csproj"
       AdditionalProperties="SelfContained=false;PublishSingleFile=false;PublishTrimmed=false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JsonSchema.Net" Version="7.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="fixtures/**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
