@@ -88,10 +88,12 @@ public static class DeckService
             using (var handler = new PowerPointHandler(temp, editable: true))
             {
                 var theme = EffectiveTheme(catalog.Themes.Single(item => item.Id == spec.Theme.Id), spec.Theme);
+                foreach (var _ in scene.Slides)
+                    handler.Add("/", "slide", null, new Dictionary<string, string> { ["layout"] = "blank" });
+
                 for (var index = 0; index < scene.Slides.Count; index++)
                 {
                     var slideNumber = index + 1;
-                    handler.Add("/", "slide", null, new Dictionary<string, string> { ["layout"] = "blank" });
                     var slideProps = new Dictionary<string, string>
                     {
                         ["background"] = theme.Tokens["background"],
@@ -105,8 +107,9 @@ public static class DeckService
                     var notes = spec.Slides[index].Notes;
                     if (!string.IsNullOrWhiteSpace(notes))
                         handler.Add($"/slide[{slideNumber}]", "notes", null,
-                            new Dictionary<string, string> { ["text"] = notes });
+                             new Dictionary<string, string> { ["text"] = notes });
                 }
+                handler.Save();
             }
             ValidateGeneratedPackage(temp);
             if (expectedRevision.HasValue)
