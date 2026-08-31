@@ -77,6 +77,7 @@ public static class DeckService
         var catalog = DeckCatalogLoader.Load();
         EnsureValid(spec, catalog, specPath);
         var scene = CreatePreviewScene(spec, specPath, catalog);
+        DebugDeck($"scene elements: {string.Join(", ", scene.Slides.SelectMany(slide => slide.Elements).Select(element => element.Type))}");
         var target = Path.GetFullPath(outputPath);
         var directory = Path.GetDirectoryName(target) ?? Directory.GetCurrentDirectory();
         Directory.CreateDirectory(directory);
@@ -110,6 +111,11 @@ public static class DeckService
                              new Dictionary<string, string> { ["text"] = notes });
                 }
                 handler.Save();
+            }
+            using (var saved = PresentationDocument.Open(temp, false))
+            {
+                var slideParts = saved.PresentationPart?.SlideParts.ToList() ?? [];
+                DebugDeck($"saved parts: slides={slideParts.Count}, charts={slideParts.Sum(slide => slide.Parts.Count(part => part.OpenXmlPart is ChartPart))}");
             }
             ValidateGeneratedPackage(temp);
             if (expectedRevision.HasValue)
@@ -387,7 +393,8 @@ public static class DeckService
         props["categories"] = string.Join(',', categories.Select(SanitizeChartToken));
         props["data"] = string.Join(';', series);
         if (!string.IsNullOrWhiteSpace(element.Text)) props["title"] = element.Text;
-        handler.Add(slidePath, "chart", null, props);
+        var path = handler.Add(slidePath, "chart", null, props);
+        DebugDeck($"added chart '{element.Id}' at {path}");
     }
 
     private static void AddTable(PowerPointHandler handler, string slidePath, DeckPreviewElement element,
@@ -410,7 +417,8 @@ public static class DeckService
         props.Remove("margin");
         props.Remove("autofit");
         props["data"] = string.Join(';', encodedRows);
-        handler.Add(slidePath, "table", null, props);
+        var path = handler.Add(slidePath, "table", null, props);
+        DebugDeck($"added table '{element.Id}' at {path}");
     }
 
     private static JsonElement RequireObjectData(DeckPreviewElement element)
@@ -438,4 +446,10 @@ public static class DeckService
         : value;
 
     private static string Cm(double value) => value.ToString("0.###", CultureInfo.InvariantCulture) + "cm";
+
+    private static void DebugDeck(string message)
+    {
+        if (Environment.GetEnvironmentVariable("OFFICECLI_DECK_DEBUG") == "1")
+            Console.Error.WriteLine($"[deck-debug] {message}");
+    }
 }
