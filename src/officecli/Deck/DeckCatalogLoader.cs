@@ -21,7 +21,7 @@ public static class DeckCatalogLoader
             ?? throw new InvalidOperationException("Embedded presentation catalog is unavailable.");
         using var reader = new StreamReader(stream, Encoding.UTF8);
         var json = reader.ReadToEnd();
-        var source = JsonSerializer.Deserialize<CatalogSource>(json, DeckJson.Options)
+        var source = JsonSerializer.Deserialize<DeckCatalogSource>(json, DeckJson.Options)
             ?? throw new InvalidOperationException("Embedded presentation catalog is invalid.");
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(json))).ToLowerInvariant();
         var layouts = source.Layouts.Select(layout => layout with
@@ -35,11 +35,11 @@ public static class DeckCatalogLoader
         }).ToList();
         return new DeckCatalog(source.Version, hash, source.Themes, layouts);
     }
+}
 
-    private sealed record CatalogSource
-    {
-        public string Version { get; init; } = "1";
-        public List<DeckTheme> Themes { get; init; } = [];
-        public List<DeckLayout> Layouts { get; init; } = [];
-    }
+internal sealed record DeckCatalogSource
+{
+    public string Version { get; init; } = "1";
+    public List<DeckTheme> Themes { get; init; } = [];
+    public List<DeckLayout> Layouts { get; init; } = [];
 }

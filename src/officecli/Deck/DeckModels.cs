@@ -124,6 +124,8 @@ public sealed record DeckDiagnostic(
 
 public sealed record DeckValidationResult(bool Valid, IReadOnlyList<DeckDiagnostic> Diagnostics);
 
+public sealed record DeckBuildResult(bool Success, string Output, long Revision);
+
 public sealed record DeckPreviewScene(
     long Revision,
     string ThemeId,
@@ -157,5 +159,19 @@ public static class DeckJson
         PropertyNameCaseInsensitive = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         WriteIndented = true,
+        TypeInfoResolver = DeckJsonContext.Default,
     };
 }
+
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    PropertyNameCaseInsensitive = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    WriteIndented = true)]
+[JsonSerializable(typeof(DeckSpec))]
+[JsonSerializable(typeof(DeckCatalogSource))]
+[JsonSerializable(typeof(DeckCatalog))]
+[JsonSerializable(typeof(DeckValidationResult))]
+[JsonSerializable(typeof(DeckBuildResult))]
+[JsonSerializable(typeof(DeckPreviewScene))]
+internal partial class DeckJsonContext : JsonSerializerContext;

@@ -51,7 +51,7 @@ static partial class CommandBuilder
             var spec = DeckService.LoadSpec(specFile.FullName);
             var expectedRevision = result.GetValue(expectedRevisionOption);
             var output = DeckService.Build(spec, specFile.FullName, result.GetValue(outputOption)!.FullName, expectedRevision);
-            Console.WriteLine(JsonSerializer.Serialize(new { success = true, output, revision = spec.Revision }, DeckJson.Options));
+            Console.WriteLine(JsonSerializer.Serialize(new DeckBuildResult(true, output, spec.Revision), DeckJson.Options));
             return 0;
         }, json: true));
         deck.Add(build);
