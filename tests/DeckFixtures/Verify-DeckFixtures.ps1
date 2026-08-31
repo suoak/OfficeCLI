@@ -19,7 +19,7 @@ Get-ChildItem -LiteralPath $PSScriptRoot -Filter '*.workmate-deck.json' | ForEac
         $names = @($archive.Entries | ForEach-Object FullName)
         $slideCount = @($names | Where-Object { $_ -match '^ppt/slides/slide\d+\.xml$' }).Count
         $notesCount = @($names | Where-Object { $_ -match '^ppt/notesSlides/notesSlide\d+\.xml$' }).Count
-        $chartEntries = @($names | Where-Object { $_ -match '^ppt/charts/chart(?:Ex)?\d*\.xml$' })
+        $chartEntries = @($names | Where-Object { $_ -match '^ppt/(?:[^/]+/)*charts/chart(?:Ex)?\d*\.xml$' })
         $chartCount = $chartEntries.Count
         $tableCount = 0
         $archive.Entries | Where-Object { $_.FullName -match '^ppt/slides/slide\d+\.xml$' } | ForEach-Object {
@@ -30,7 +30,7 @@ Get-ChildItem -LiteralPath $PSScriptRoot -Filter '*.workmate-deck.json' | ForEac
         if ($slideCount -ne 12) { throw "Expected 12 slides in $($fixture.Name), found $slideCount" }
         if ($notesCount -ne 12) { throw "Expected editable notes on all 12 slides in $($fixture.Name), found $notesCount" }
         if ($chartCount -lt 1) {
-            $actualChartEntries = @($names | Where-Object { $_ -like 'ppt/charts/*' }) -join ', '
+            $actualChartEntries = @($names | Where-Object { $_ -match '^ppt/(?:[^/]+/)*charts/' }) -join ', '
             throw "Expected an editable chart in $($fixture.Name); chart entries: $actualChartEntries"
         }
         if ($tableCount -lt 1) { throw "Expected an editable table in $($fixture.Name)" }
