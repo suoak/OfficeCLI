@@ -121,6 +121,7 @@ public static class DeckService
             if (expectedRevision.HasValue)
                 EnsureExpectedRevision(LoadSpec(specPath).Revision, expectedRevision);
             AtomicReplace(temp, target);
+            DebugPackageParts(target, "target");
             return target;
         }
         catch
@@ -141,10 +142,7 @@ public static class DeckService
     {
         if (new FileInfo(target).LinkTarget != null)
             throw new InvalidDataException("Refusing to replace a symbolic-link PPTX target.");
-        if (File.Exists(target))
-            File.Replace(temp, target, null, ignoreMetadataErrors: true);
-        else
-            File.Move(temp, target);
+        File.Move(temp, target, overwrite: true);
     }
 
     public static DeckValidationResult Validate(DeckSpec spec, string specPath)
@@ -451,5 +449,17 @@ public static class DeckService
     {
         if (Environment.GetEnvironmentVariable("OFFICECLI_DECK_DEBUG") == "1")
             Console.Error.WriteLine($"[deck-debug] {message}");
+    }
+
+    private static void DebugPackageParts(string path, string label)
+    {
+        if (Environment.GetEnvironmentVariable("OFFICECLI_DECK_DEBUG") != "1") return;
+        using var document = PresentationDocument.Open(path, false);
+        var slideParts = document.PresentationPart?.SlideParts.ToList() ?? [];
+        var charts = slideParts.SelectMany(slide => slide.Parts)
+            .Where(part => part.OpenXmlPart is ChartPart)
+            .Select(part => part.OpenXmlPart.Uri.ToString())
+            .ToList();
+        DebugDeck($"{label} parts: slides={slideParts.Count}, charts={charts.Count}, chartUris={string.Join(",", charts)}");
     }
 }
