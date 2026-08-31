@@ -19,6 +19,7 @@ try {
     $deck.slides = @($deck.slides | Select-Object -First 10)
     $benchmarkSpec = Join-Path $workingRoot 'benchmark.workmate-deck.json'
     [System.IO.File]::WriteAllText($benchmarkSpec, ($deck | ConvertTo-Json -Depth 100 -Compress))
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'visual.svg') -Destination $workingRoot
 
     $warmOutput = Join-Path $workingRoot 'warm.pptx'
     & dotnet run --project $project -c Release --no-build -- deck build $benchmarkSpec --output $warmOutput --json | Out-Null
