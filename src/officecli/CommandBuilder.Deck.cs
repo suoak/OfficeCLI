@@ -37,8 +37,8 @@ static partial class CommandBuilder
         deck.Add(validate);
 
         var buildSpecArg = new Argument<FileInfo>("spec") { Description = "Path to a *.workmate-deck.json file" };
-        var outputOption = new Option<FileInfo>("--output", "Output .pptx path") { Required = true };
-        var expectedRevisionOption = new Option<long?>("--expected-revision", "Reject stale DeckSpec builds");
+        var outputOption = new Option<FileInfo>("--output") { Description = "Output .pptx path", Required = true };
+        var expectedRevisionOption = new Option<long?>("--expected-revision") { Description = "Reject stale DeckSpec builds" };
         outputOption.Aliases.Add("-o");
         var build = new Command("build", "Compile a WorkMate DeckSpec into an editable PPTX");
         build.Add(buildSpecArg);
