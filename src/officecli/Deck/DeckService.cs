@@ -21,8 +21,31 @@ public static class DeckService
         if (!info.Exists) throw new FileNotFoundException($"Deck spec not found: {path}", path);
         if (info.Length > MaxSpecBytes) throw new InvalidDataException("Deck spec exceeds the 2 MB limit.");
         using var stream = File.OpenRead(path);
-        return JsonSerializer.Deserialize(stream, DeckJsonContext.Default.DeckSpec)
+        var spec = JsonSerializer.Deserialize(stream, DeckJsonContext.Default.DeckSpec)
             ?? throw new InvalidDataException("Deck spec is empty or invalid.");
+        return NormalizeSpec(spec);
+    }
+
+    private static DeckSpec NormalizeSpec(DeckSpec spec)
+    {
+        var theme = spec.Theme ?? new DeckThemeSelection();
+        var slides = (spec.Slides ?? []).Select(slide => slide with
+        {
+            Blocks = (slide.Blocks ?? []).Select(block => block with
+            {
+                Items = block.Items ?? [],
+            }).ToList(),
+            Controls = slide.Controls ?? [],
+        }).ToList();
+
+        return spec with
+        {
+            Metadata = spec.Metadata ?? new DeckMetadata(),
+            Theme = theme with { BrandTokens = theme.BrandTokens ?? [] },
+            Slides = slides,
+            Assets = spec.Assets ?? [],
+            Extensions = spec.Extensions ?? [],
+        };
     }
 
     public static DeckPreviewScene RenderPreview(DeckSpec spec, string specPath)
