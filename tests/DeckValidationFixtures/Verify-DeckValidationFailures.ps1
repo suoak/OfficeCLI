@@ -34,7 +34,8 @@ $staleOutput = Join-Path ([System.IO.Path]::GetTempPath()) 'officecli-stale-deck
 [System.IO.File]::WriteAllText($staleOutput, 'previous-valid-output')
 try {
     $staleResult = (& dotnet run --project $project -c Release --no-build -- deck build $validDeck --output $staleOutput --expected-revision ($actualRevision + 1) --json 2>&1 | Out-String)
-    if ($LASTEXITCODE -eq 0) { throw 'A stale expected revision must fail the build.' }
+    $staleExitCode = $LASTEXITCODE
+    if ($staleExitCode -eq 0) { throw 'A stale expected revision must fail the build.' }
     if ([System.IO.File]::ReadAllText($staleOutput) -ne 'previous-valid-output') {
         throw "A stale build replaced the previous output. Command output: $staleResult"
     }
@@ -42,3 +43,7 @@ try {
 finally {
     Remove-Item -LiteralPath $staleOutput -Force -ErrorAction SilentlyContinue
 }
+
+# The last native command is expected to fail. Reset its exit code so a successful
+# negative-path assertion does not fail PowerShell hosts that propagate LASTEXITCODE.
+$global:LASTEXITCODE = 0
