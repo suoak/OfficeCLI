@@ -91,8 +91,7 @@ public static class DeckService
                 for (var index = 0; index < scene.Slides.Count; index++)
                 {
                     var slideNumber = index + 1;
-                    if (slideNumber > 1)
-                        handler.Add("/", "slide", null, new Dictionary<string, string> { ["layout"] = "blank" });
+                    handler.Add("/", "slide", null, new Dictionary<string, string> { ["layout"] = "blank" });
                     var slideProps = new Dictionary<string, string>
                     {
                         ["background"] = theme.Tokens["background"],
