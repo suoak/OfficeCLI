@@ -25,6 +25,8 @@ permissions:
 
 jobs:
   deck-fixtures:
+    env:
+      OFFICECLI_DECK_DEBUG: '1'
     strategy:
       fail-fast: false
       matrix:
