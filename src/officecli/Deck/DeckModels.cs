@@ -151,18 +151,6 @@ public sealed record DeckPreviewElement(
     string? AssetPath = null,
     JsonElement? Data = null);
 
-public static class DeckJson
-{
-    public static readonly JsonSerializerOptions Options = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = true,
-        TypeInfoResolver = DeckJsonContext.Default,
-    };
-}
-
 [JsonSourceGenerationOptions(
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     PropertyNameCaseInsensitive = true,

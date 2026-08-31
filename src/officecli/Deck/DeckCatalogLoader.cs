@@ -21,7 +21,7 @@ public static class DeckCatalogLoader
             ?? throw new InvalidOperationException("Embedded presentation catalog is unavailable.");
         using var reader = new StreamReader(stream, Encoding.UTF8);
         var json = reader.ReadToEnd();
-        var source = JsonSerializer.Deserialize<DeckCatalogSource>(json, DeckJson.Options)
+        var source = JsonSerializer.Deserialize(json, DeckJsonContext.Default.DeckCatalogSource)
             ?? throw new InvalidOperationException("Embedded presentation catalog is invalid.");
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(json))).ToLowerInvariant();
         var layouts = source.Layouts.Select(layout => layout with

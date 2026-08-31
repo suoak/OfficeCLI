@@ -21,7 +21,7 @@ public static class DeckService
         if (!info.Exists) throw new FileNotFoundException($"Deck spec not found: {path}", path);
         if (info.Length > MaxSpecBytes) throw new InvalidDataException("Deck spec exceeds the 2 MB limit.");
         using var stream = File.OpenRead(path);
-        return JsonSerializer.Deserialize<DeckSpec>(stream, DeckJson.Options)
+        return JsonSerializer.Deserialize(stream, DeckJsonContext.Default.DeckSpec)
             ?? throw new InvalidDataException("Deck spec is empty or invalid.");
     }
 

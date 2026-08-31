@@ -17,7 +17,7 @@ static partial class CommandBuilder
         catalog.Add(rootJsonOption);
         catalog.SetAction(result => SafeRun(() =>
         {
-            Console.WriteLine(JsonSerializer.Serialize(DeckCatalogLoader.Load(), DeckJson.Options));
+            Console.WriteLine(JsonSerializer.Serialize(DeckCatalogLoader.Load(), DeckJsonContext.Default.DeckCatalog));
             return 0;
         }, json: true));
         deck.Add(catalog);
@@ -31,7 +31,7 @@ static partial class CommandBuilder
             var specFile = result.GetValue(specArg)!;
             var spec = DeckService.LoadSpec(specFile.FullName);
             var validation = DeckService.Validate(spec, specFile.FullName);
-            Console.WriteLine(JsonSerializer.Serialize(validation, DeckJson.Options));
+            Console.WriteLine(JsonSerializer.Serialize(validation, DeckJsonContext.Default.DeckValidationResult));
             return validation.Valid ? 0 : 1;
         }, json: true));
         deck.Add(validate);
@@ -51,7 +51,9 @@ static partial class CommandBuilder
             var spec = DeckService.LoadSpec(specFile.FullName);
             var expectedRevision = result.GetValue(expectedRevisionOption);
             var output = DeckService.Build(spec, specFile.FullName, result.GetValue(outputOption)!.FullName, expectedRevision);
-            Console.WriteLine(JsonSerializer.Serialize(new DeckBuildResult(true, output, spec.Revision), DeckJson.Options));
+            Console.WriteLine(JsonSerializer.Serialize(
+                new DeckBuildResult(true, output, spec.Revision),
+                DeckJsonContext.Default.DeckBuildResult));
             return 0;
         }, json: true));
         deck.Add(build);
@@ -69,7 +71,9 @@ static partial class CommandBuilder
                 throw new ArgumentException("deck render currently supports only --format preview.");
             var specFile = result.GetValue(renderSpecArg)!;
             var spec = DeckService.LoadSpec(specFile.FullName);
-            Console.WriteLine(JsonSerializer.Serialize(DeckService.RenderPreview(spec, specFile.FullName), DeckJson.Options));
+            Console.WriteLine(JsonSerializer.Serialize(
+                DeckService.RenderPreview(spec, specFile.FullName),
+                DeckJsonContext.Default.DeckPreviewScene));
             return 0;
         }, json: true));
         deck.Add(render);
