@@ -33,10 +33,10 @@ $actualRevision = (Get-Content -LiteralPath $validDeck -Raw | ConvertFrom-Json).
 $staleOutput = Join-Path ([System.IO.Path]::GetTempPath()) 'officecli-stale-deck-output.pptx'
 [System.IO.File]::WriteAllText($staleOutput, 'previous-valid-output')
 try {
-    & dotnet run --project $project -c Release --no-build -- deck build $validDeck --output $staleOutput --expected-revision ($actualRevision + 1) --json
+    $staleResult = (& dotnet run --project $project -c Release --no-build -- deck build $validDeck --output $staleOutput --expected-revision ($actualRevision + 1) --json 2>&1 | Out-String)
     if ($LASTEXITCODE -eq 0) { throw 'A stale expected revision must fail the build.' }
     if ([System.IO.File]::ReadAllText($staleOutput) -ne 'previous-valid-output') {
-        throw 'A stale build replaced the previous output.'
+        throw "A stale build replaced the previous output. Command output: $staleResult"
     }
 }
 finally {
