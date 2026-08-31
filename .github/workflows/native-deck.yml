@@ -2,9 +2,23 @@ name: Native Deck Regression
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/native-deck.yml'
+      - 'src/officecli/CommandBuilder.cs'
+      - 'src/officecli/CommandBuilder.Deck.cs'
+      - 'src/officecli/Deck/**'
+      - 'src/officecli/officecli.csproj'
+      - 'tests/DeckFixtures/**'
+      - 'tests/DeckValidationFixtures/**'
   push:
-    branches:
-      - main
+    paths:
+      - '.github/workflows/native-deck.yml'
+      - 'src/officecli/CommandBuilder.cs'
+      - 'src/officecli/CommandBuilder.Deck.cs'
+      - 'src/officecli/Deck/**'
+      - 'src/officecli/officecli.csproj'
+      - 'tests/DeckFixtures/**'
+      - 'tests/DeckValidationFixtures/**'
 
 permissions:
   contents: read
