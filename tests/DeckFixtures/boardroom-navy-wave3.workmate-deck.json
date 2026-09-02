@@ -185,6 +185,108 @@
         }
       ],
       "notes": "Speaker notes for Closing"
+    },
+    {
+      "id": "s-chart",
+      "role": "trend",
+      "layoutId": "chart-insight-right",
+      "title": "Chart",
+      "controls": {
+        "chartType": "bar",
+        "showInsight": true
+      },
+      "blocks": [
+        {
+          "id": "ct",
+          "type": "text",
+          "slot": "title",
+          "text": "Trend"
+        },
+        {
+          "id": "ch",
+          "type": "chart",
+          "slot": "chart",
+          "data": {
+            "chartType": "bar",
+            "categories": [
+              "Q1",
+              "Q2",
+              "Q3",
+              "Q4"
+            ],
+            "series": [
+              {
+                "name": "Layouts",
+                "values": [
+                  26,
+                  56,
+                  70,
+                  83
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "ins",
+          "type": "list",
+          "slot": "insight",
+          "items": [
+            "Wave 3 crossed 80",
+            "Packing reused"
+          ]
+        }
+      ],
+      "notes": "Speaker notes for Chart"
+    },
+    {
+      "id": "s-table",
+      "role": "trend",
+      "layoutId": "table-callouts",
+      "title": "Table",
+      "controls": {
+        "showInsight": true
+      },
+      "blocks": [
+        {
+          "id": "tt",
+          "type": "text",
+          "slot": "title",
+          "text": "Catalog"
+        },
+        {
+          "id": "tb",
+          "type": "table",
+          "slot": "table",
+          "data": {
+            "headers": [
+              "Wave",
+              "Layouts"
+            ],
+            "rows": [
+              [
+                "1",
+                "26"
+              ],
+              [
+                "2",
+                "56"
+              ],
+              [
+                "3",
+                "83"
+              ]
+            ]
+          }
+        },
+        {
+          "id": "ti",
+          "type": "text",
+          "slot": "insight",
+          "text": "Keep native DeckSpec path."
+        }
+      ],
+      "notes": "Speaker notes for Table"
     }
   ],
   "assets": []
