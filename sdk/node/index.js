@@ -27,7 +27,8 @@
  * Protocol (matches ResidentServer.cs / ResidentClient.cs):
  *   - pipe name : officecli-<SHA256(fullpath)[:16] uppercase>;
  *                 fullpath upper-cased on macOS/Windows, left as-is on Linux.
- *   - unix path : $TMPDIR/CoreFxPipe_<name>  (+ "-ping");  $TMPDIR else /tmp
+ *   - unix path : $TMPDIR/CoreFxPipe_<name> (+ "-ping"), with the same short
+ *                 fallback directory as OfficeCLI when the socket path is too long
  *   - win path  : \\.\pipe\<name>            (+ "-ping")
  *   - framing   : one request line + one response line, UTF-8, '\n' terminated;
  *                 one connection == one command. The reply may carry a UTF-8 BOM
@@ -92,8 +93,15 @@ class OfficeCliError extends Error {
 
 // ---------------------------------------------------------------- pipe address
 function dotnetTempDir() {
-  // Mirror .NET Path.GetTempPath() on Unix exactly: $TMPDIR else /tmp.
-  return process.env.TMPDIR || '/tmp';
+  // Mirror PipeTempDirGuard: long Unix-domain socket paths are redirected to a
+  // deterministic per-user directory before OfficeCLI creates its named pipes.
+  const current = process.env.TMPDIR || '/tmp';
+  if (IS_WIN) return current;
+  const sunPathMax = process.platform === 'linux' ? 108 : 104;
+  const maxSocketFileName = 43;
+  if (Buffer.byteLength(current, 'utf8') + maxSocketFileName <= sunPathMax) return current;
+  const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+  return `/tmp/officecli-${uid}`;
 }
 
 // Match the path officecli's resident hashes into the pipe name. On Windows it

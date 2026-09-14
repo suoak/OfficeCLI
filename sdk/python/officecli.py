@@ -31,7 +31,8 @@ field-and-prop reference — this shell adds none of its own.
 Protocol (matches ResidentServer.cs / ResidentClient.cs):
   - pipe name : officecli-<SHA256(fullpath)[:16] uppercase>;
                 fullpath upper-cased on macOS/Windows, left as-is on Linux.
-  - unix path : $TMPDIR/CoreFxPipe_<name>  (+ "-ping");  $TMPDIR else /tmp
+  - unix path : $TMPDIR/CoreFxPipe_<name> (+ "-ping"), with the same short
+                fallback directory as OfficeCLI when the socket path is too long
   - win path  : \\.\pipe\<name>            (+ "-ping")
   - framing   : one request line + one response line, UTF-8, '\n' terminated;
                 one connection == one command.
@@ -99,8 +100,16 @@ class OfficeCliError(Exception):
 
 # ---------------------------------------------------------------- pipe address
 def _dotnet_tempdir():
-    # Mirror .NET Path.GetTempPath() on Unix exactly: $TMPDIR else /tmp.
-    return os.environ.get("TMPDIR") or "/tmp"
+    """Mirror PipeTempDirGuard's deterministic Unix socket-path fallback."""
+    current = os.environ.get("TMPDIR") or "/tmp"
+    if _IS_WIN:
+        return current
+    sun_path_max = 108 if sys.platform.startswith("linux") else 104
+    max_socket_file_name = 43
+    if len(current.encode("utf-8")) + max_socket_file_name <= sun_path_max:
+        return current
+    uid = os.getuid() if hasattr(os, "getuid") else 0
+    return f"/tmp/officecli-{uid}"
 
 
 def _canonical_path(file_path):
