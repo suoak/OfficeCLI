@@ -38,11 +38,26 @@ public partial class ExcelHandler
             $"Unknown totals-row function '{tok}'. Valid: sum, average, count, countNums, max, min, stdDev, var, none, custom.")
     };
 
+    /// <summary>
+    /// Text of a CT_Rst — a shared-string item (<c>&lt;si&gt;</c>) or an inline
+    /// string (<c>&lt;is&gt;</c>) — EXCLUDING its <c>&lt;rPh&gt;</c> phonetic
+    /// guide. Issue #343: <c>InnerText</c> concatenates the guide into the value,
+    /// so a Japanese cell read back as "項目コウモク" instead of "項目". The guide
+    /// annotates the base text rather than being part of it, and is surfaced
+    /// separately as <c>Format["phonetic"]</c>. Both SDK types derive from
+    /// RstType, so every cell-text read shares this one rule.
+    /// </summary>
+    internal static string RstTextWithoutPhonetic(RstType? rst)
+        => rst == null
+            ? ""
+            : rst.Text?.Text
+                ?? string.Concat(rst.Elements<Run>().Select(r => r.Text?.Text ?? ""));
+
     private string GetCellDisplayValue(Cell cell, Core.FormulaEvaluator? evaluator = null)
     {
         if (cell.DataType?.Value == CellValues.InlineString)
         {
-            return cell.InlineString?.InnerText ?? "";
+            return RstTextWithoutPhonetic(cell.InlineString);
         }
 
         var value = cell.CellValue?.Text ?? "";
@@ -53,7 +68,7 @@ public partial class ExcelHandler
             if (sst?.SharedStringTable != null && int.TryParse(value, out int idx))
             {
                 var item = sst.SharedStringTable.Elements<SharedStringItem>().ElementAtOrDefault(idx);
-                return item?.InnerText ?? value;
+                if (item != null) return RstTextWithoutPhonetic(item);
             }
         }
 
@@ -413,8 +428,9 @@ public partial class ExcelHandler
             || value.Equals("-Infinity", StringComparison.Ordinal)
             || value.Equals("+Infinity", StringComparison.Ordinal))
             return (1, 0.0, value);
-        if (double.TryParse(value, System.Globalization.NumberStyles.Any,
-            System.Globalization.CultureInfo.InvariantCulture, out var num))
+        // Same numeric definition as storage and formulas: "1,5" is text, so it
+        // sorts with the strings instead of landing between 14 and 16.
+        if (Core.NumericText.TryParse(value, out var num))
         {
             // Defensive: even non-literal inputs can produce non-finite doubles
             // (e.g. "1e999" overflows to +Infinity). Keep those in the string bucket.

@@ -374,7 +374,9 @@ public partial class PowerPointHandler
             // subsequent real items number continuously: 1.,2. not 3.,4.). The same
             // hasVisibleText/hasVisibleField notion is reused below for the &nbsp;
             // empty-line placeholder.
-            var hasMath = para.OuterXml.Contains("oMath");
+            // Match the element tag, not the bare word: a run whose TEXT says
+            // "oMath" (escaped as &lt;m:oMath in OuterXml) must not count as math.
+            var hasMath = para.OuterXml.Contains("<m:oMath");
             var runs = para.Elements<Drawing.Run>().ToList();
             bool hasVisibleField = para.Elements<Drawing.Field>()
                 .Any(f => !string.IsNullOrEmpty(ResolveFieldText(f, slideNumber)));
@@ -531,33 +533,6 @@ public partial class PowerPointHandler
                 sb.Append($"<span class=\"bullet\"{buStyle}>{HtmlEncode(bullet)}</span>");
             }
 
-            // Check for OfficeMath (a14:m inside mc:AlternateContent) in paragraph XML
-            var paraXml = para.OuterXml;
-            if (paraXml.Contains("oMath"))
-            {
-                // AlternateContent is opaque to Descendants() — parse from XML.
-                // A paragraph can interleave several a14:m equations with its text
-                // runs; emit every match, not just the first (#228 dropped the
-                // second equation of a two-equation paragraph).
-                foreach (System.Text.RegularExpressions.Match mathMatch in System.Text.RegularExpressions.Regex.Matches(paraXml,
-                    @"<m:oMathPara[^>]*>.*?</m:oMathPara>|<m:oMath[^>]*>.*?</m:oMath>",
-                    System.Text.RegularExpressions.RegexOptions.Singleline))
-                {
-                    try
-                    {
-                        var wrapper = new OpenXmlUnknownElement("wrapper");
-                        wrapper.InnerXml = mathMatch.Value;
-                        var oMath = wrapper.Descendants().FirstOrDefault(e => e.LocalName == "oMathPara" || e.LocalName == "oMath");
-                        if (oMath != null)
-                        {
-                            var latex = FormulaParser.ToLatex(oMath);
-                            sb.Append($"<span class=\"katex-formula\" data-formula=\"{HtmlEncode(latex)}\"></span>");
-                        }
-                    }
-                    catch { }
-                }
-            }
-
             // R35: per-paragraph tab-stop context. Read the explicit <a:tabLst>
             // (defined stops with absolute positions + alignment); fall back to
             // the body's default tab interval for tabs beyond the last stop.
@@ -655,6 +630,33 @@ public partial class PowerPointHandler
                             fldRun.RunProperties = (Drawing.RunProperties)fldRpr.CloneNode(true);
                         fldRun.Text = new Drawing.Text(fldText);
                         RenderRun(sb, fldRun, themeColors, paraSize, placeholderPart, themeFontFallback, fontScale, paraColor, inhBold, inhItalic, tabCtx, inhCap, inhU, inhStrike, inhSpc);
+                    }
+                    else if (hasMath && child.OuterXml.Contains("<m:oMath"))
+                    {
+                        // Keep a14:m / AlternateContent equations at their position
+                        // among runs, breaks and fields (#341). Extracting from the
+                        // whole paragraph first moved every equation before its text.
+                        // AlternateContent is opaque to Descendants(), so retain the
+                        // XML extraction and emit every equation in this child (#228).
+                        // The child-level check keeps a:pPr / a:endParaRPr from
+                        // paying for the regex just because a sibling holds math.
+                        foreach (System.Text.RegularExpressions.Match mathMatch in System.Text.RegularExpressions.Regex.Matches(child.OuterXml,
+                            @"<m:oMathPara[^>]*>.*?</m:oMathPara>|<m:oMath[^>]*>.*?</m:oMath>",
+                            System.Text.RegularExpressions.RegexOptions.Singleline))
+                        {
+                            try
+                            {
+                                var wrapper = new OpenXmlUnknownElement("wrapper");
+                                wrapper.InnerXml = mathMatch.Value;
+                                var oMath = wrapper.Descendants().FirstOrDefault(e => e.LocalName == "oMathPara" || e.LocalName == "oMath");
+                                if (oMath != null)
+                                {
+                                    var latex = FormulaParser.ToLatex(oMath);
+                                    sb.Append($"<span class=\"katex-formula\" data-formula=\"{HtmlEncode(latex)}\"></span>");
+                                }
+                            }
+                            catch { }
+                        }
                     }
                 }
             }

@@ -167,10 +167,12 @@ public class BatchItem
     public string? Xml { get; set; }
     // NEWLINE-SEMANTICS-V2: dumps are versioned via a leading
     // {"command":"meta","dumpVersion":2} item. v2 encodes soft line breaks
-    // as '\v' in text props ('\n' means a paragraph boundary); dumps
-    // WITHOUT a meta item are legacy v1, where '\n' meant a soft break —
-    // BatchCompat rewrites those on replay so old dump files keep restoring
-    // the exact original structure.
+    // as '\v' in text props ('\n' means a paragraph boundary). A batch that
+    // EXPLICITLY declares a version below 2 opts back into the pre-v2 reading
+    // and BatchCompat rewrites its '\n' to '\v' on replay; a batch with NO
+    // meta item follows current semantics, because a hand-written batch
+    // carries no meta either and reading those as legacy made one batch item
+    // behave differently from the identical single command.
     public int? DumpVersion { get; set; }
 
     internal static readonly HashSet<string> KnownFields = new(StringComparer.OrdinalIgnoreCase)
@@ -223,6 +225,8 @@ public class BatchResult
     public string? Code { get; set; }
     /// <summary>The original batch item, included when the command fails so the agent can inspect/retry.</summary>
     public BatchItem? Item { get; set; }
+    /// <summary>Advisory diagnostics produced while executing this item.</summary>
+    internal List<OfficeCli.Core.CliWarning>? Warnings { get; set; }
 }
 
 /// <summary>
@@ -242,6 +246,8 @@ internal class BatchResultConverter : JsonConverter<BatchResult>
         if (root.TryGetProperty("error", out var err)) result.Error = err.GetString();
         if (root.TryGetProperty("code", out var cod)) result.Code = cod.GetString();
         if (root.TryGetProperty("item", out var itm)) result.Item = JsonSerializer.Deserialize(itm.GetRawText(), BatchJsonContext.Default.BatchItem);
+        if (root.TryGetProperty("warnings", out var wrn))
+            result.Warnings = JsonSerializer.Deserialize(wrn.GetRawText(), OfficeCli.Core.AppJsonContext.Default.ListCliWarning);
         return result;
     }
 
@@ -274,6 +280,11 @@ internal class BatchResultConverter : JsonConverter<BatchResult>
                 writer.WritePropertyName("item");
                 JsonSerializer.Serialize(writer, value.Item, BatchJsonContext.Default.BatchItem);
             }
+        }
+        if (value.Warnings is { Count: > 0 })
+        {
+            writer.WritePropertyName("warnings");
+            JsonSerializer.Serialize(writer, value.Warnings, OfficeCli.Core.AppJsonContext.Default.ListCliWarning);
         }
         writer.WriteEndObject();
     }

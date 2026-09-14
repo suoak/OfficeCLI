@@ -1116,9 +1116,19 @@ static partial class CommandBuilder
                 if (item.Text == null)
                     throw new ArgumentException("'import' command requires 'text' field with the CSV/TSV content.");
                 // CONSISTENCY(import-vocabulary): props mirror the standalone
-                // command's options — format=csv|tsv, header, start-cell.
+                // command's options — format=csv|tsv, delimiter, decimal, header,
+                // start-cell. Keep this list in step with CommandBuilder.Import.cs;
+                // a prop missing here is a silently different batch behaviour.
                 char importDelim = ',';
-                if (props.TryGetValue("format", out var importFmt) && !string.IsNullOrEmpty(importFmt))
+                if (props.TryGetValue("delimiter", out var importDelimRaw) && !string.IsNullOrEmpty(importDelimRaw))
+                {
+                    importDelim = ParseImportDelimiter(importDelimRaw);
+                }
+                else if (OfficeCli.Core.CsvSepDeclaration.TryRead(item.Text, out var declaredSep, out _))
+                {
+                    importDelim = declaredSep;
+                }
+                else if (props.TryGetValue("format", out var importFmt) && !string.IsNullOrEmpty(importFmt))
                 {
                     importDelim = importFmt.ToLowerInvariant() switch
                     {
@@ -1134,7 +1144,14 @@ static partial class CommandBuilder
                     ? importSc
                     : props.TryGetValue("startcell", out var importSc2) && !string.IsNullOrEmpty(importSc2)
                         ? importSc2 : "A1";
-                return importXl.Import(importParent, item.Text, importDelim, importHeader, importStart);
+                var importDecimal = ParseImportDecimal(
+                    props.TryGetValue("decimal", out var importDec) ? importDec : null, importDelim);
+                // Judge the first DATA line, not a `sep=X` declaration.
+                var importWarnText = OfficeCli.Core.CsvSepDeclaration.TryRead(item.Text, out _, out var afterDeclB)
+                    ? afterDeclB : item.Text;
+                if (LikelyWrongDelimiterWarning(importWarnText, importDelim) is { } importWarn)
+                    Console.Error.WriteLine(importWarn);
+                return importXl.Import(importParent, item.Text, importDelim, importHeader, importStart, importDecimal);
             }
             case "remove":
             {
@@ -1215,7 +1232,11 @@ static partial class CommandBuilder
                 var partPath = item.Part ?? "/document";
                 var xpath = item.Xpath ?? "";
                 var action = item.Action ?? "";
+                // Same post-write validator diff the single-shot raw-set does;
+                // a batch item used to apply raw XML with no diagnostic at all.
+                var errorsBefore = handler.Validate().Select(e => e.Description).ToHashSet();
                 handler.RawSet(partPath, xpath, action, item.Xml);
+                ReportNewErrorsToWarningContext(handler, errorsBefore);
                 return $"raw-set {action} applied";
             }
             case "add-part":
@@ -1224,7 +1245,9 @@ static partial class CommandBuilder
                     throw new ArgumentException("'add-part' command requires 'parent' field. Example: {\"command\": \"add-part\", \"parent\": \"/slide[1]\", \"type\": \"smartart\", \"props\": {\"data\": \"rId2\"}}");
                 if (string.IsNullOrEmpty(item.Type))
                     throw new ArgumentException("'add-part' command requires 'type' field. Supported (pptx): chart, smartart, video, audio, model3d, ole, image, hyperlink, theme.");
+                var errorsBefore = handler.Validate().Select(e => e.Description).ToHashSet();
                 var (relId, partOut) = handler.AddPart(item.Parent, item.Type, props);
+                ReportNewErrorsToWarningContext(handler, errorsBefore);
                 return $"Created {item.Type} part: relId={relId} path={partOut}";
             }
             case "validate":
@@ -1410,6 +1433,11 @@ static partial class CommandBuilder
                                 System.Text.Json.JsonSerializer.Serialize(slimWriter, r.Item, BatchJsonContext.Default.BatchItem);
                             }
                         }
+                        if (r.Warnings is { Count: > 0 })
+                        {
+                            slimWriter.WritePropertyName("warnings");
+                            System.Text.Json.JsonSerializer.Serialize(slimWriter, r.Warnings, OfficeCli.Core.AppJsonContext.Default.ListCliWarning);
+                        }
                         slimWriter.WriteEndObject();
                     }
                     slimWriter.WriteEndArray();
@@ -1443,6 +1471,9 @@ static partial class CommandBuilder
                 {
                     @out.WriteLine($"{prefix}ERROR: {r.Error}");
                 }
+                if (r.Warnings is { Count: > 0 })
+                    foreach (var warning in r.Warnings)
+                        @out.WriteLine($"  WARNING: {warning.Message}");
             }
 
             var succeeded = results.Count(r => r.Success);
@@ -1486,6 +1517,18 @@ static partial class CommandBuilder
                 (err.Part != null ? $" (Part: {err.Part})" : ""),
             Code = "validation_error"
         }).ToList();
+    }
+
+    // Batch-item flavour: the validator diff rides on the item's own
+    // WarningContext scope (ApplyBatchItems opens one per item), so the
+    // caveat lands in that step's `warnings` like every other per-item
+    // diagnostic instead of on stdout.
+    internal static void ReportNewErrorsToWarningContext(OfficeCli.Core.IDocumentHandler handler, HashSet<string> errorsBefore)
+    {
+        var warnings = ReportNewErrorsAsWarnings(handler, errorsBefore);
+        if (warnings == null || !OfficeCli.Core.WarningContext.IsActive) return;
+        foreach (var w in warnings)
+            OfficeCli.Core.WarningContext.Add(w.Message, w.Code);
     }
 
     internal static void ReportNewErrors(OfficeCli.Core.IDocumentHandler handler, HashSet<string> errorsBefore, List<CliWarning>? preComputed = null)
