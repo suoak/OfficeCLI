@@ -405,6 +405,19 @@ class Document:
         if r.returncode != 0:
             raise OfficeCliError(r.returncode, r.stderr or r.stdout)
 
+        # `officecli open` starts the resident asynchronously. Fast clients can
+        # otherwise reach the main pipe before the server has bound its sockets,
+        # which surfaces as ENOENT on macOS runners. Wait on the dedicated ping
+        # pipe before allowing the first real command through.
+        readiness = max(1.0, min(self.timeout, 10.0))
+        deadline = time.monotonic() + readiness
+        while time.monotonic() < deadline:
+            if _serves(self._ping, self.path, timeout=0.25):
+                return
+            time.sleep(0.05)
+        raise OfficeCliError(-1,
+            f"resident did not become ready within {readiness:.1f}s")
+
     # -- transport primitive: build {Command,Args,Props,Json}, forward, parse --
     def _cmd(self, command, args=None, props=None, as_json=True, timeout=None):
         # `as_json`, not `json`, so we don't shadow the imported json module.

@@ -470,6 +470,18 @@ class Document {
     if (await serves(this._ping, this.path)) return;
     const r = runCli(this.bin, ['open', this.path]);
     if (r.status !== 0) throw new OfficeCliError(r.status == null ? -1 : r.status, r.stderr || r.stdout);
+
+    // `officecli open` starts the resident asynchronously. Fast clients can
+    // otherwise reach the main pipe before the server has bound its sockets,
+    // which surfaces as ENOENT on macOS runners. Wait on the dedicated ping
+    // pipe so the first real command is sent only after the resident is ready.
+    const readinessMs = Math.max(1000, Math.min(this.timeout, 10000));
+    const deadline = Date.now() + readinessMs;
+    while (Date.now() < deadline) {
+      if (await serves(this._ping, this.path, 250)) return;
+      await sleep(50);
+    }
+    throw new OfficeCliError(-1, `resident did not become ready within ${readinessMs}ms`);
   }
 
   async _cmd(command, args, props, asJson = true, timeoutMs) {
