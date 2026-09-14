@@ -51,5 +51,11 @@ jobs:
       - name: Node SDK auto-install + round-trip
         run: node sdk/node/smoke.js
 
+      - name: Diagnose Unix resident sockets
+        if: failure() && runner.os != 'Windows'
+        run: |
+          echo "TMPDIR=${TMPDIR:-<unset>}"
+          find /tmp "${TMPDIR:-/tmp}" -maxdepth 2 -name '*officecli*' -print 2>/dev/null | sort -u
+
       - name: Python SDK auto-install + round-trip
         run: python sdk/python/smoke.py
