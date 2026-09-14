@@ -318,6 +318,21 @@ static partial class CommandBuilder
             }
             if (hasExited())
             {
+                // A concurrently started resident may have won the per-file
+                // lock while this child exited as the redundant loser. Its
+                // ping socket can appear just after the pre-exit probe above,
+                // so give the winner a bounded chance to become ready before
+                // reporting a false startup failure to the caller.
+                for (int winnerProbe = 0; winnerProbe < 10; winnerProbe++)
+                {
+                    if (ResidentClient.TryConnect(filePath, out _))
+                    {
+                        dispose();
+                        return true;
+                    }
+                    Thread.Sleep(50);
+                }
+
                 var stderr = readStderr();
                 // CONSISTENCY(cli-error-first-line): the resident process dumps its
                 // full call stack on a startup crash; surface only the first line

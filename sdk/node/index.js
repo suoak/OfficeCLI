@@ -27,7 +27,8 @@
  * Protocol (matches ResidentServer.cs / ResidentClient.cs):
  *   - pipe name : officecli-<SHA256(fullpath)[:16] uppercase>;
  *                 fullpath upper-cased on macOS/Windows, left as-is on Linux.
- *   - unix path : $TMPDIR/CoreFxPipe_<name>  (+ "-ping");  $TMPDIR else /tmp
+ *   - unix path : $TMPDIR/CoreFxPipe_<name> (+ "-ping"), with the same short
+ *                 fallback directory as OfficeCLI when the socket path is too long
  *   - win path  : \\.\pipe\<name>            (+ "-ping")
  *   - framing   : one request line + one response line, UTF-8, '\n' terminated;
  *                 one connection == one command. The reply may carry a UTF-8 BOM
@@ -90,25 +91,28 @@ class OfficeCliError extends Error {
 
 // ---------------------------------------------------------------- pipe address
 function dotnetTempDir() {
-  // Mirror .NET Path.GetTempPath() on Unix exactly: $TMPDIR else /tmp.
-  return process.env.TMPDIR || '/tmp';
+  // Mirror PipeTempDirGuard: long Unix-domain socket paths are redirected to a
+  // deterministic per-user directory before OfficeCLI creates its named pipes.
+  const current = process.env.TMPDIR || '/tmp';
+  if (IS_WIN) return current;
+  const sunPathMax = process.platform === 'linux' ? 108 : 104;
+  const maxSocketFileName = 43;
+  if (Buffer.byteLength(current, 'utf8') + maxSocketFileName <= sunPathMax) return current;
+  const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+  return `/tmp/officecli-${uid}`;
 }
 
 // Match the path officecli's resident hashes into the pipe name. On Windows it
 // derives the name from GetFullPath, which expands 8.3 short components (e.g.
 // RUNNER~1, or any user name > 8 chars under %TEMP%) to their long form.
-// path.resolve does NOT expand 8.3, so a short path would hash to a different
-// pipe and every connect fails with ENOENT — hence realpath, which does expand
-// it. realpath needs the file to exist; fall back to the resolved path when it
-// doesn't (e.g. pre-create). realpath ALSO resolves symlinks/junctions, which
-// GetFullPath does not; harmless here because we hand this resolved path to the
-// resident, so the server's GetFullPath sees the already-resolved string and
-// both sides hash the same thing. Windows only — on Linux/macOS officecli uses
-// GetFullPath (no symlink resolution), so realpath would diverge there
-// (e.g. /tmp → /private/tmp on macOS).
+// path.resolve does NOT expand Windows 8.3 components or macOS's /var symlink,
+// so it can hash to a different pipe and every connect fails with ENOENT.
+// realpath needs the file to exist; fall back to the resolved path when it does
+// not. Linux remains lexical because its resident path is case-sensitive and
+// does not canonicalize symlinks in this protocol.
 function canonicalPath(filePath) {
   const resolved = path.resolve(filePath);
-  if (IS_WIN) {
+  if (IS_WIN || IS_MAC) {
     try { return fs.realpathSync.native(resolved); } catch (_) { /* not there yet */ }
   }
   return resolved;
@@ -269,7 +273,10 @@ async function serves(pingPath, fullPath, timeoutMs = 1000) {
   }
   const served = ((resp && resp.Stdout) || '').trim(); // ping echoes the served path
   if (!served) return false;
-  const a = path.resolve(served);
+  // The resident hashes the canonical identity but reports its lexical input
+  // path. Canonicalize the echoed path too, or macOS `/var` versus
+  // `/private/var` makes a healthy resident look unrelated.
+  const a = canonicalPath(served);
   return a === fullPath || ((IS_MAC || IS_WIN) && a.toLowerCase() === fullPath.toLowerCase());
 }
 
@@ -453,13 +460,31 @@ class Document {
     this._restarting = null; // in-flight dead-resident restart (serializes callers)
   }
 
-  async _start() {
+  async _waitForServing(readinessMs) {
+    const deadline = Date.now() + readinessMs;
+    while (Date.now() < deadline) {
+      if (await serves(this._ping, this.path, 250)) return true;
+      await sleep(50);
+    }
+    return false;
+  }
+
+  async _start(existingGraceMs = 0) {
     // Reuse a resident already serving this file (no spawn). serves() is a real
     // liveness probe (ping + path match), so a stale/dead socket falls through
     // to `officecli open`, which replaces it via TryConnect.
+    if (existingGraceMs > 0 && await this._waitForServing(existingGraceMs)) return;
     if (await serves(this._ping, this.path)) return;
     const r = runCli(this.bin, ['open', this.path]);
     if (r.status !== 0) throw new OfficeCliError(r.status == null ? -1 : r.status, r.stderr || r.stdout);
+
+    // `officecli open` starts the resident asynchronously. Fast clients can
+    // otherwise reach the main pipe before the server has bound its sockets,
+    // which surfaces as ENOENT on macOS runners. Wait on the dedicated ping
+    // pipe so the first real command is sent only after the resident is ready.
+    const readinessMs = Math.max(1000, Math.min(this.timeout, 10000));
+    if (await this._waitForServing(readinessMs)) return;
+    throw new OfficeCliError(-1, `resident did not become ready within ${readinessMs}ms`);
   }
 
   async _cmd(command, args, props, asJson = true, timeoutMs) {
@@ -574,7 +599,9 @@ async function create(filePath, args = [], { binary = 'officecli', timeoutMs = 3
   const r = runCli(bin, ['create', full, ...args]);
   if (r.status !== 0) throw new OfficeCliError(r.status == null ? -1 : r.status, r.stderr || r.stdout);
   const doc = new Document(full, bin, timeoutMs);
-  await doc._start(); // create auto-started a resident; this finds it alive (no extra spawn)
+  // Give the resident auto-started by `create` time to bind before falling back
+  // to `open`; immediately starting a second owner can race the first process.
+  await doc._start(5000);
   return doc;
 }
 
