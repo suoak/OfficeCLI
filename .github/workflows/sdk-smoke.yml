@@ -43,6 +43,21 @@ jobs:
         with:
           python-version: '3.12'
 
+      - uses: actions/setup-dotnet@v5
+        if: github.event_name == 'pull_request'
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build pull-request OfficeCLI
+        if: github.event_name == 'pull_request'
+        run: |
+          out="$RUNNER_TEMP/officecli-pr"
+          dotnet publish src/officecli/officecli.csproj -c Release \
+            -p:SelfContained=false -p:PublishSingleFile=false -p:PublishTrimmed=false \
+            --output "$out"
+          chmod +x "$out"/officecli* 2>/dev/null || true
+          echo "$out" >> "$GITHUB_PATH"
+
       - name: SDK pipe-path unit tests
         run: |
           node sdk/node/pipe-path.test.js
