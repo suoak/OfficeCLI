@@ -71,20 +71,18 @@ _builtin_open = open   # preserved; this module defines its own open() below
 
 # officecli's official installer (README one-liner). install() shells out to it;
 # the missing-CLI error points users at it / at install().
-# Installer scripts: the d.officecli.ai mirror is primary; GitHub raw is only a
-# fallback (same order as install.sh / install.ps1 themselves). The mirror is
-# Cloudflare-fronted and reachable where raw.githubusercontent.com may be
-# rate-limited or blocked.
-_INSTALL_SH_MIRROR = "https://d.officecli.ai/install.sh"
-_INSTALL_SH_GITHUB = "https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh"
-_INSTALL_PS1_MIRROR = "https://d.officecli.ai/install.ps1"
-_INSTALL_PS1_GITHUB = "https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1"
+# Prefer the independently maintained suoak release scripts. The legacy mirror
+# remains a fallback for networks where raw.githubusercontent.com is blocked.
+_INSTALL_SH_PRIMARY = "https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh"
+_INSTALL_SH_FALLBACK = "https://d.officecli.ai/install.sh"
+_INSTALL_PS1_PRIMARY = "https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1"
+_INSTALL_PS1_FALLBACK = "https://d.officecli.ai/install.ps1"
 _MISSING_CLI = (
     "officecli CLI not found: {bin!r} is not on PATH nor in the default install "
     "location (~/.local/bin, or %LOCALAPPDATA%\\OfficeCLI on Windows). This SDK only forwards "
     "commands to the officecli binary, which must be installed separately. Install it:\n"
     "    python -m officecli install            # runs the official installer\n"
-    "    # or: curl -fsSL " + _INSTALL_SH_MIRROR + " | bash\n"
+    "    # or: curl -fsSL " + _INSTALL_SH_PRIMARY + " | bash\n"
     "Already installed elsewhere? pass binary=\"/path/to/officecli\"."
 )
 
@@ -350,7 +348,7 @@ def _ensure_binary(binary, auto_install=True):
         if _runs_ok(cand):
             return cand                    # a working officecli is already here
     if auto_install:
-        print("officecli CLI not found — installing from d.officecli.ai ...", file=sys.stderr)
+        print("officecli CLI not found — installing from suoak/OfficeCLI ...", file=sys.stderr)
         install()                          # CLI absent/unusable → official installer
         for cand in filter(None, (shutil.which(binary), _install_dir_candidate(binary))):
             if _runs_ok(cand):
@@ -605,28 +603,28 @@ def install():
     NOT captured, so the installer's progress and checksum lines stream to the
     user."""
     if _IS_WIN:
-        print(f"Installing officecli via {_INSTALL_PS1_MIRROR} (github fallback) ...", file=sys.stderr)
+        print(f"Installing officecli via {_INSTALL_PS1_PRIMARY} (mirror fallback) ...", file=sys.stderr)
         # Windows PowerShell (powershell.exe) ships with the OS; -ExecutionPolicy
         # Bypass lets the remote script run without changing machine policy. Fetch
-        # the script mirror-first, github fallback, then run it.
-        ps = (f"$s = try {{ irm '{_INSTALL_PS1_MIRROR}' }} "
-              f"catch {{ irm '{_INSTALL_PS1_GITHUB}' }}; $s | iex")
+        # the autonomous release script first, then fall back to the mirror.
+        ps = (f"$s = try {{ irm '{_INSTALL_PS1_PRIMARY}' }} "
+              f"catch {{ irm '{_INSTALL_PS1_FALLBACK}' }}; $s | iex")
         r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps])
         if r.returncode != 0:
             raise OfficeCliError(r.returncode,
                 f"officecli install failed (exit {r.returncode}). Run manually:\n"
-                f"    irm {_INSTALL_PS1_MIRROR} | iex")
+                f"    irm {_INSTALL_PS1_PRIMARY} | iex")
         return None
-    print(f"Installing officecli via {_INSTALL_SH_MIRROR} (github fallback) ...", file=sys.stderr)
-    # (curl mirror || curl github) | bash — the subshell emits whichever fetch
+    print(f"Installing officecli via {_INSTALL_SH_PRIMARY} (mirror fallback) ...", file=sys.stderr)
+    # (curl github || curl mirror) | bash — the subshell emits whichever fetch
     # succeeds; the group keeps the pipe bound to the whole fallback. Output is
     # NOT captured, so progress and checksum lines stream to the user.
-    sh = f"(curl -fsSL {_INSTALL_SH_MIRROR} 2>/dev/null || curl -fsSL {_INSTALL_SH_GITHUB}) | bash"
+    sh = f"(curl -fsSL {_INSTALL_SH_PRIMARY} 2>/dev/null || curl -fsSL {_INSTALL_SH_FALLBACK}) | bash"
     r = subprocess.run(["bash", "-c", sh])
     if r.returncode != 0:
         raise OfficeCliError(r.returncode,
             f"officecli install failed (exit {r.returncode}). Run manually:\n"
-            f"    curl -fsSL {_INSTALL_SH_MIRROR} | bash")
+            f"    curl -fsSL {_INSTALL_SH_PRIMARY} | bash")
     return None
 
 
