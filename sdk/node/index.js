@@ -273,7 +273,10 @@ async function serves(pingPath, fullPath, timeoutMs = 1000) {
   }
   const served = ((resp && resp.Stdout) || '').trim(); // ping echoes the served path
   if (!served) return false;
-  const a = path.resolve(served);
+  // The resident hashes the canonical identity but reports its lexical input
+  // path. Canonicalize the echoed path too, or macOS `/var` versus
+  // `/private/var` makes a healthy resident look unrelated.
+  const a = canonicalPath(served);
   return a === fullPath || ((IS_MAC || IS_WIN) && a.toLowerCase() === fullPath.toLowerCase());
 }
 

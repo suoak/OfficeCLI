@@ -284,7 +284,10 @@ def _serves(ping_path, full_path, timeout=1.0):
     served = resp.get("Stdout", "").strip()   # ping echoes the served file path
     if not served:
         return False
-    a = os.path.abspath(served)
+    # The resident hashes the canonical identity but reports its lexical input
+    # path. Canonicalize the echo too, or macOS /var versus /private/var makes a
+    # healthy resident look unrelated.
+    a = _canonical_path(served)
     return a == full_path or ((_IS_MAC or _IS_WIN) and a.lower() == full_path.lower())
 
 
