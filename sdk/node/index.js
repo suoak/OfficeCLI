@@ -107,18 +107,14 @@ function dotnetTempDir() {
 // Match the path officecli's resident hashes into the pipe name. On Windows it
 // derives the name from GetFullPath, which expands 8.3 short components (e.g.
 // RUNNER~1, or any user name > 8 chars under %TEMP%) to their long form.
-// path.resolve does NOT expand 8.3, so a short path would hash to a different
-// pipe and every connect fails with ENOENT — hence realpath, which does expand
-// it. realpath needs the file to exist; fall back to the resolved path when it
-// doesn't (e.g. pre-create). realpath ALSO resolves symlinks/junctions, which
-// GetFullPath does not; harmless here because we hand this resolved path to the
-// resident, so the server's GetFullPath sees the already-resolved string and
-// both sides hash the same thing. Windows only — on Linux/macOS officecli uses
-// GetFullPath (no symlink resolution), so realpath would diverge there
-// (e.g. /tmp → /private/tmp on macOS).
+// path.resolve does NOT expand Windows 8.3 components or macOS's /var symlink,
+// so it can hash to a different pipe and every connect fails with ENOENT.
+// realpath needs the file to exist; fall back to the resolved path when it does
+// not. Linux remains lexical because its resident path is case-sensitive and
+// does not canonicalize symlinks in this protocol.
 function canonicalPath(filePath) {
   const resolved = path.resolve(filePath);
-  if (IS_WIN) {
+  if (IS_WIN || IS_MAC) {
     try { return fs.realpathSync.native(resolved); } catch (_) { /* not there yet */ }
   }
   return resolved;
