@@ -31,7 +31,8 @@ field-and-prop reference — this shell adds none of its own.
 Protocol (matches ResidentServer.cs / ResidentClient.cs):
   - pipe name : officecli-<SHA256(fullpath)[:16] uppercase>;
                 fullpath upper-cased on macOS/Windows, left as-is on Linux.
-  - unix path : $TMPDIR/CoreFxPipe_<name>  (+ "-ping");  $TMPDIR else /tmp
+  - unix path : $TMPDIR/CoreFxPipe_<name> (+ "-ping"), with the same short
+                fallback directory as OfficeCLI when the socket path is too long
   - win path  : \\.\pipe\<name>            (+ "-ping")
   - framing   : one request line + one response line, UTF-8, '\n' terminated;
                 one connection == one command.
@@ -70,20 +71,18 @@ _builtin_open = open   # preserved; this module defines its own open() below
 
 # officecli's official installer (README one-liner). install() shells out to it;
 # the missing-CLI error points users at it / at install().
-# Installer scripts: the d.officecli.ai mirror is primary; GitHub raw is only a
-# fallback (same order as install.sh / install.ps1 themselves). The mirror is
-# Cloudflare-fronted and reachable where raw.githubusercontent.com may be
-# rate-limited or blocked.
-_INSTALL_SH_MIRROR = "https://d.officecli.ai/install.sh"
-_INSTALL_SH_GITHUB = "https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh"
-_INSTALL_PS1_MIRROR = "https://d.officecli.ai/install.ps1"
-_INSTALL_PS1_GITHUB = "https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1"
+# Prefer the independently maintained suoak release scripts. The legacy mirror
+# remains a fallback for networks where raw.githubusercontent.com is blocked.
+_INSTALL_SH_PRIMARY = "https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh"
+_INSTALL_SH_FALLBACK = "https://d.officecli.ai/install.sh"
+_INSTALL_PS1_PRIMARY = "https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1"
+_INSTALL_PS1_FALLBACK = "https://d.officecli.ai/install.ps1"
 _MISSING_CLI = (
     "officecli CLI not found: {bin!r} is not on PATH nor in the default install "
     "location (~/.local/bin, or %LOCALAPPDATA%\\OfficeCLI on Windows). This SDK only forwards "
     "commands to the officecli binary, which must be installed separately. Install it:\n"
     "    python -m officecli install            # runs the official installer\n"
-    "    # or: curl -fsSL " + _INSTALL_SH_MIRROR + " | bash\n"
+    "    # or: curl -fsSL " + _INSTALL_SH_PRIMARY + " | bash\n"
     "Already installed elsewhere? pass binary=\"/path/to/officecli\"."
 )
 
@@ -99,25 +98,29 @@ class OfficeCliError(Exception):
 
 # ---------------------------------------------------------------- pipe address
 def _dotnet_tempdir():
-    # Mirror .NET Path.GetTempPath() on Unix exactly: $TMPDIR else /tmp.
-    return os.environ.get("TMPDIR") or "/tmp"
+    """Mirror PipeTempDirGuard's deterministic Unix socket-path fallback."""
+    current = os.environ.get("TMPDIR") or "/tmp"
+    if _IS_WIN:
+        return current
+    sun_path_max = 108 if sys.platform.startswith("linux") else 104
+    max_socket_file_name = 43
+    if len(current.encode("utf-8")) + max_socket_file_name <= sun_path_max:
+        return current
+    uid = os.getuid() if hasattr(os, "getuid") else 0
+    return f"/tmp/officecli-{uid}"
 
 
 def _canonical_path(file_path):
     """Match the path officecli's resident hashes into the pipe name. On Windows
     it derives the name from GetFullPath, which expands 8.3 short components
     (RUNNER~1, or any user name > 8 chars under %TEMP%) to their long form.
-    os.path.abspath does NOT expand 8.3, so a short path hashes to a different
-    pipe and every connect fails with ENOENT — hence realpath, which does expand
-    it. realpath needs the file to exist; fall back to the abspath when it
-    doesn't. realpath ALSO resolves symlinks/junctions, which GetFullPath does
-    not; harmless here because we hand this resolved path to the resident, so the
-    server's GetFullPath sees the already-resolved string and both sides hash the
-    same thing. Windows only — on unix officecli uses GetFullPath (no symlink
-    resolution), so realpath would diverge there (e.g. /tmp -> /private/tmp on
-    macOS)."""
+    os.path.abspath does NOT expand Windows 8.3 components or macOS's /var
+    symlink, so it can hash to a different pipe and every connect fails with
+    ENOENT. realpath needs the file to exist; fall back to abspath otherwise.
+    Linux remains lexical because its resident path is case-sensitive and does
+    not canonicalize symlinks in this protocol."""
     resolved = os.path.abspath(file_path)
-    if _IS_WIN:
+    if _IS_WIN or _IS_MAC:
         try:
             return os.path.realpath(resolved)
         except OSError:
@@ -281,7 +284,10 @@ def _serves(ping_path, full_path, timeout=1.0):
     served = resp.get("Stdout", "").strip()   # ping echoes the served file path
     if not served:
         return False
-    a = os.path.abspath(served)
+    # The resident hashes the canonical identity but reports its lexical input
+    # path. Canonicalize the echo too, or macOS /var versus /private/var makes a
+    # healthy resident look unrelated.
+    a = _canonical_path(served)
     return a == full_path or ((_IS_MAC or _IS_WIN) and a.lower() == full_path.lower())
 
 
@@ -345,7 +351,7 @@ def _ensure_binary(binary, auto_install=True):
         if _runs_ok(cand):
             return cand                    # a working officecli is already here
     if auto_install:
-        print("officecli CLI not found — installing from d.officecli.ai ...", file=sys.stderr)
+        print("officecli CLI not found — installing from suoak/OfficeCLI ...", file=sys.stderr)
         install()                          # CLI absent/unusable → official installer
         for cand in filter(None, (shutil.which(binary), _install_dir_candidate(binary))):
             if _runs_ok(cand):
@@ -370,7 +376,8 @@ def _run_cli(binary, argv):
 
 # ---------------------------------------------------------------- the shell
 class Document:
-    def __init__(self, path, binary="officecli", timeout=30.0):
+    def __init__(self, path, binary="officecli", timeout=30.0,
+                 _existing_grace=0.0):
         # Canonical (Windows 8.3-expanded) so the pipe name AND the _serves()
         # path comparison both match what the resident reports.
         self.path = _canonical_path(path)
@@ -378,9 +385,17 @@ class Document:
         self.timeout = timeout          # connect timeout (s); the reply read blocks
         self._main, self._ping = pipe_paths(self.path)
         self._restart_lock = threading.Lock()   # serialize dead-resident restarts
-        self._start()
+        self._start(_existing_grace)
 
-    def _start(self):
+    def _wait_for_serving(self, readiness):
+        deadline = time.monotonic() + readiness
+        while time.monotonic() < deadline:
+            if _serves(self._ping, self.path, timeout=0.25):
+                return True
+            time.sleep(0.05)
+        return False
+
+    def _start(self, existing_grace=0.0):
         # If a resident is ALREADY serving this file, reuse it — no process spawn.
         # Mirrors officecli, where a command after `create` reuses the resident
         # `create` auto-started instead of re-running `open`. _serves() is a real
@@ -388,6 +403,8 @@ class Document:
         # socket-file-exists check, so a stale/dead socket fails the probe and
         # falls through to `officecli open`, which replaces it via TryConnect.
         # (A plain os.path.exists() here would wrongly skip on a stale socket.)
+        if existing_grace > 0 and self._wait_for_serving(existing_grace):
+            return
         if _serves(self._ping, self.path):
             return
         # Otherwise spawn `officecli open` (one process). It's idempotent and uses
@@ -395,6 +412,16 @@ class Document:
         r = _run_cli(self.bin, ["open", self.path])
         if r.returncode != 0:
             raise OfficeCliError(r.returncode, r.stderr or r.stdout)
+
+        # `officecli open` starts the resident asynchronously. Fast clients can
+        # otherwise reach the main pipe before the server has bound its sockets,
+        # which surfaces as ENOENT on macOS runners. Wait on the dedicated ping
+        # pipe before allowing the first real command through.
+        readiness = max(1.0, min(self.timeout, 10.0))
+        if self._wait_for_serving(readiness):
+            return
+        raise OfficeCliError(-1,
+            f"resident did not become ready within {readiness:.1f}s")
 
     # -- transport primitive: build {Command,Args,Props,Json}, forward, parse --
     def _cmd(self, command, args=None, props=None, as_json=True, timeout=None):
@@ -540,9 +567,9 @@ def create(path, *args, binary="officecli", timeout=30.0, auto_install=True):
     r = _run_cli(binary, ["create", full, *args])
     if r.returncode != 0:
         raise OfficeCliError(r.returncode, r.stderr or r.stdout)
-    # create auto-started a resident for the new file; bind a handle to it
-    # (Document.__init__ -> _start -> _serves finds it alive, so no extra spawn).
-    return Document(full, binary=binary, timeout=timeout)
+    # Give the resident auto-started by `create` time to bind before falling back
+    # to `open`; immediately starting a second owner can race the first process.
+    return Document(full, binary=binary, timeout=timeout, _existing_grace=5.0)
 
 
 def open(path, binary="officecli", timeout=30.0, auto_install=True):
@@ -587,28 +614,28 @@ def install():
     NOT captured, so the installer's progress and checksum lines stream to the
     user."""
     if _IS_WIN:
-        print(f"Installing officecli via {_INSTALL_PS1_MIRROR} (github fallback) ...", file=sys.stderr)
+        print(f"Installing officecli via {_INSTALL_PS1_PRIMARY} (mirror fallback) ...", file=sys.stderr)
         # Windows PowerShell (powershell.exe) ships with the OS; -ExecutionPolicy
         # Bypass lets the remote script run without changing machine policy. Fetch
-        # the script mirror-first, github fallback, then run it.
-        ps = (f"$s = try {{ irm '{_INSTALL_PS1_MIRROR}' }} "
-              f"catch {{ irm '{_INSTALL_PS1_GITHUB}' }}; $s | iex")
+        # the autonomous release script first, then fall back to the mirror.
+        ps = (f"$s = try {{ irm '{_INSTALL_PS1_PRIMARY}' }} "
+              f"catch {{ irm '{_INSTALL_PS1_FALLBACK}' }}; $s | iex")
         r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps])
         if r.returncode != 0:
             raise OfficeCliError(r.returncode,
                 f"officecli install failed (exit {r.returncode}). Run manually:\n"
-                f"    irm {_INSTALL_PS1_MIRROR} | iex")
+                f"    irm {_INSTALL_PS1_PRIMARY} | iex")
         return None
-    print(f"Installing officecli via {_INSTALL_SH_MIRROR} (github fallback) ...", file=sys.stderr)
-    # (curl mirror || curl github) | bash — the subshell emits whichever fetch
+    print(f"Installing officecli via {_INSTALL_SH_PRIMARY} (mirror fallback) ...", file=sys.stderr)
+    # (curl github || curl mirror) | bash — the subshell emits whichever fetch
     # succeeds; the group keeps the pipe bound to the whole fallback. Output is
     # NOT captured, so progress and checksum lines stream to the user.
-    sh = f"(curl -fsSL {_INSTALL_SH_MIRROR} 2>/dev/null || curl -fsSL {_INSTALL_SH_GITHUB}) | bash"
+    sh = f"(curl -fsSL {_INSTALL_SH_PRIMARY} 2>/dev/null || curl -fsSL {_INSTALL_SH_FALLBACK}) | bash"
     r = subprocess.run(["bash", "-c", sh])
     if r.returncode != 0:
         raise OfficeCliError(r.returncode,
             f"officecli install failed (exit {r.returncode}). Run manually:\n"
-            f"    curl -fsSL {_INSTALL_SH_MIRROR} | bash")
+            f"    curl -fsSL {_INSTALL_SH_PRIMARY} | bash")
     return None
 
 
