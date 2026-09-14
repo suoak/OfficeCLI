@@ -75,9 +75,9 @@ _builtin_open = open   # preserved; this module defines its own open() below
 # Cloudflare-fronted and reachable where raw.githubusercontent.com may be
 # rate-limited or blocked.
 _INSTALL_SH_MIRROR = "https://d.officecli.ai/install.sh"
-_INSTALL_SH_GITHUB = "https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh"
+_INSTALL_SH_GITHUB = "https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh"
 _INSTALL_PS1_MIRROR = "https://d.officecli.ai/install.ps1"
-_INSTALL_PS1_GITHUB = "https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1"
+_INSTALL_PS1_GITHUB = "https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1"
 _MISSING_CLI = (
     "officecli CLI not found: {bin!r} is not on PATH nor in the default install "
     "location (~/.local/bin, or %LOCALAPPDATA%\\OfficeCLI on Windows). This SDK only forwards "

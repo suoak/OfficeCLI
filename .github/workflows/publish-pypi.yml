@@ -8,7 +8,7 @@ name: Publish SDK (PyPI)
 #
 # Auth: PyPI Trusted Publishing (OIDC), no token / no API key. Configure the
 # trusted publisher for the officecli-sdk project on pypi.org:
-#   owner: iOfficeAI   repo: OfficeCLI   workflow: publish-pypi.yml
+#   owner: suoak   repo: OfficeCLI   workflow: publish-pypi.yml
 # (officecli-sdk already exists on PyPI, so the publisher can be added directly.)
 
 on:

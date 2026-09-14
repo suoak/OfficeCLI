@@ -8,7 +8,7 @@
 
 **OfficeCLI의 내장 HTML 렌더링 엔진은 문서를 고충실도로 재현합니다 — 이것이 AI에게 "눈"을 줍니다.** `.docx` / `.xlsx` / `.pptx`를 HTML 또는 PNG로 렌더링하여 *렌더링 → 보기 → 수정* 루프를 닫습니다.
 
-[![GitHub Release](https://img.shields.io/github/v/release/iOfficeAI/OfficeCLI)](https://github.com/iOfficeAI/OfficeCLI/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/suoak/OfficeCLI)](https://github.com/suoak/OfficeCLI/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 [English](README.md) | [中文](README_zh.md) | [日本語](README_ja.md) | **한국어**
@@ -21,7 +21,7 @@
   <img src="assets/ppt-process.webp" alt="CSBU WorkMate에서 OfficeCLI로 PPT 제작 과정" width="100%">
 </p>
 
-<p align="center"><em><a href="https://github.com/iOfficeAI/AionUi">CSBU WorkMate</a>에서 OfficeCLI로 PPT 제작 과정</em></p>
+<p align="center"><em><a href="https://github.com/suoak/AionUi">CSBU WorkMate</a>에서 OfficeCLI로 PPT 제작 과정</em></p>
 
 <p align="center"><strong>PowerPoint 프레젠테이션</strong></p>
 
@@ -74,9 +74,9 @@ curl -fsSL https://officecli.ai/SKILL.md
 
 ## 일반 사용자용
 
-**옵션 A — GUI:** [**CSBU WorkMate**](https://github.com/iOfficeAI/AionUi)를 설치하세요 — 자연어로 Office 문서를 만들고 편집할 수 있는 데스크톱 앱입니다. 내부적으로 OfficeCLI가 구동됩니다. 원하는 것을 설명하기만 하면 CSBU WorkMate가 모든 것을 처리합니다.
+**옵션 A — GUI:** [**CSBU WorkMate**](https://github.com/suoak/AionUi)를 설치하세요 — 자연어로 Office 문서를 만들고 편집할 수 있는 데스크톱 앱입니다. 내부적으로 OfficeCLI가 구동됩니다. 원하는 것을 설명하기만 하면 CSBU WorkMate가 모든 것을 처리합니다.
 
-**옵션 B — CLI:** [GitHub Releases](https://github.com/iOfficeAI/OfficeCLI/releases)에서 플랫폼에 맞는 바이너리를 다운로드한 후 실행:
+**옵션 B — CLI:** [GitHub Releases](https://github.com/suoak/OfficeCLI/releases)에서 플랫폼에 맞는 바이너리를 다운로드한 후 실행:
 
 ```bash
 officecli install
@@ -88,8 +88,8 @@ officecli install
 
 ```bash
 # 1. 설치 (macOS / Linux) — 또는: brew install officecli / npm install -g @officecli/officecli
-curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-# Windows (PowerShell): irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
+curl -fsSL https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh | bash
+# Windows (PowerShell): irm https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1 | iex
 
 # 2. 빈 PowerPoint 생성
 officecli create deck.pptx
@@ -173,11 +173,11 @@ officecli add deck.pptx / --type slide --prop title="Q4 Report"
 | Excel (.xlsx) | ✅ | ✅ | ✅ |
 | PowerPoint (.pptx) | ✅ | ✅ | ✅ |
 
-**Word** — 완전한 [i18n 및 RTL 지원](https://github.com/iOfficeAI/OfficeCLI/wiki/i18n) (스크립트별 글꼴 슬롯, 스크립트별 BCP-47 언어 태그 `lang.latin/ea/cs`, 복합 스크립트 굵게/기울임/크기, 단락/런/섹션/표/스타일/머리글/바닥글/docDefaults에 캐스케이드되는 `direction=rtl`, `rtlGutter` + `pgBorders` 단축형, 힌디/아랍어/태국어/CJK 로캘 인식 페이지 번호), [단락](https://github.com/iOfficeAI/OfficeCLI/wiki/word-paragraph), [런](https://github.com/iOfficeAI/OfficeCLI/wiki/word-run), [표](https://github.com/iOfficeAI/OfficeCLI/wiki/word-table), [스타일](https://github.com/iOfficeAI/OfficeCLI/wiki/word-style), [머리글/바닥글](https://github.com/iOfficeAI/OfficeCLI/wiki/word-header-footer), [이미지](https://github.com/iOfficeAI/OfficeCLI/wiki/word-picture) (PNG/JPG/GIF/SVG), [수식](https://github.com/iOfficeAI/OfficeCLI/wiki/word-equation), [메모](https://github.com/iOfficeAI/OfficeCLI/wiki/word-comment), [각주](https://github.com/iOfficeAI/OfficeCLI/wiki/word-footnote), [워터마크](https://github.com/iOfficeAI/OfficeCLI/wiki/word-watermark), [북마크](https://github.com/iOfficeAI/OfficeCLI/wiki/word-bookmark), [목차](https://github.com/iOfficeAI/OfficeCLI/wiki/word-toc), [차트](https://github.com/iOfficeAI/OfficeCLI/wiki/word-chart), [하이퍼링크](https://github.com/iOfficeAI/OfficeCLI/wiki/word-hyperlink), [섹션](https://github.com/iOfficeAI/OfficeCLI/wiki/word-section), [양식 필드](https://github.com/iOfficeAI/OfficeCLI/wiki/word-formfield), [콘텐츠 컨트롤 (SDT)](https://github.com/iOfficeAI/OfficeCLI/wiki/word-sdt), [필드](https://github.com/iOfficeAI/OfficeCLI/wiki/word-field) (22개 무인수 + MERGEFIELD / REF / PAGEREF / SEQ / STYLEREF / DOCPROPERTY / IF), [OLE 객체](https://github.com/iOfficeAI/OfficeCLI/wiki/word-ole), [문서 속성](https://github.com/iOfficeAI/OfficeCLI/wiki/word-document)
+**Word** — 완전한 [i18n 및 RTL 지원](https://github.com/suoak/OfficeCLI/wiki/i18n) (스크립트별 글꼴 슬롯, 스크립트별 BCP-47 언어 태그 `lang.latin/ea/cs`, 복합 스크립트 굵게/기울임/크기, 단락/런/섹션/표/스타일/머리글/바닥글/docDefaults에 캐스케이드되는 `direction=rtl`, `rtlGutter` + `pgBorders` 단축형, 힌디/아랍어/태국어/CJK 로캘 인식 페이지 번호), [단락](https://github.com/suoak/OfficeCLI/wiki/word-paragraph), [런](https://github.com/suoak/OfficeCLI/wiki/word-run), [표](https://github.com/suoak/OfficeCLI/wiki/word-table), [스타일](https://github.com/suoak/OfficeCLI/wiki/word-style), [머리글/바닥글](https://github.com/suoak/OfficeCLI/wiki/word-header-footer), [이미지](https://github.com/suoak/OfficeCLI/wiki/word-picture) (PNG/JPG/GIF/SVG), [수식](https://github.com/suoak/OfficeCLI/wiki/word-equation), [메모](https://github.com/suoak/OfficeCLI/wiki/word-comment), [각주](https://github.com/suoak/OfficeCLI/wiki/word-footnote), [워터마크](https://github.com/suoak/OfficeCLI/wiki/word-watermark), [북마크](https://github.com/suoak/OfficeCLI/wiki/word-bookmark), [목차](https://github.com/suoak/OfficeCLI/wiki/word-toc), [차트](https://github.com/suoak/OfficeCLI/wiki/word-chart), [하이퍼링크](https://github.com/suoak/OfficeCLI/wiki/word-hyperlink), [섹션](https://github.com/suoak/OfficeCLI/wiki/word-section), [양식 필드](https://github.com/suoak/OfficeCLI/wiki/word-formfield), [콘텐츠 컨트롤 (SDT)](https://github.com/suoak/OfficeCLI/wiki/word-sdt), [필드](https://github.com/suoak/OfficeCLI/wiki/word-field) (22개 무인수 + MERGEFIELD / REF / PAGEREF / SEQ / STYLEREF / DOCPROPERTY / IF), [OLE 객체](https://github.com/suoak/OfficeCLI/wiki/word-ole), [문서 속성](https://github.com/suoak/OfficeCLI/wiki/word-document)
 
-**Excel** — [셀](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-cell) (추가 시 음성 가이드/후리가나), 수식(150개 이상의 내장 함수 자동 계산, 동적 배열 함수에 `_xlfn.` 자동 접두사), [시트](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-sheet) (visible/hidden/veryHidden, 인쇄 여백, printTitleRows/Cols, RTL `sheetView`, 캐스케이드 인식 시트 이름 변경), [테이블](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-table), [정렬](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-sort) (시트/범위, 다중 키, 사이드카 인식), [조건부 서식](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-conditionalformatting), [차트](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-chart) (상자 수염, [파레토](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-chart-add) 자동 정렬 + 누적%, 로그 축 포함), [피벗 테이블](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-pivottable) (다중 필드, 날짜 그룹화, showDataAs, 정렬, 총합계, 부분합, 압축/개요/표 형식 레이아웃, 항목 레이블 반복, 빈 행, 계산 필드), [슬라이서](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-slicer), [이름 범위](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-namedrange), [데이터 유효성 검사](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-validation), [이미지](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-picture) (PNG/JPG/GIF/SVG, 이중 표현 폴백), [스파크라인](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-sparkline), [메모](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-comment) (RTL), [자동 필터](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-autofilter), [도형](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-shape), [OLE 객체](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-ole), CSV/TSV 가져오기, `$Sheet:A1` 셀 주소 지정
+**Excel** — [셀](https://github.com/suoak/OfficeCLI/wiki/excel-cell) (추가 시 음성 가이드/후리가나), 수식(150개 이상의 내장 함수 자동 계산, 동적 배열 함수에 `_xlfn.` 자동 접두사), [시트](https://github.com/suoak/OfficeCLI/wiki/excel-sheet) (visible/hidden/veryHidden, 인쇄 여백, printTitleRows/Cols, RTL `sheetView`, 캐스케이드 인식 시트 이름 변경), [테이블](https://github.com/suoak/OfficeCLI/wiki/excel-table), [정렬](https://github.com/suoak/OfficeCLI/wiki/excel-sort) (시트/범위, 다중 키, 사이드카 인식), [조건부 서식](https://github.com/suoak/OfficeCLI/wiki/excel-conditionalformatting), [차트](https://github.com/suoak/OfficeCLI/wiki/excel-chart) (상자 수염, [파레토](https://github.com/suoak/OfficeCLI/wiki/excel-chart-add) 자동 정렬 + 누적%, 로그 축 포함), [피벗 테이블](https://github.com/suoak/OfficeCLI/wiki/excel-pivottable) (다중 필드, 날짜 그룹화, showDataAs, 정렬, 총합계, 부분합, 압축/개요/표 형식 레이아웃, 항목 레이블 반복, 빈 행, 계산 필드), [슬라이서](https://github.com/suoak/OfficeCLI/wiki/excel-slicer), [이름 범위](https://github.com/suoak/OfficeCLI/wiki/excel-namedrange), [데이터 유효성 검사](https://github.com/suoak/OfficeCLI/wiki/excel-validation), [이미지](https://github.com/suoak/OfficeCLI/wiki/excel-picture) (PNG/JPG/GIF/SVG, 이중 표현 폴백), [스파크라인](https://github.com/suoak/OfficeCLI/wiki/excel-sparkline), [메모](https://github.com/suoak/OfficeCLI/wiki/excel-comment) (RTL), [자동 필터](https://github.com/suoak/OfficeCLI/wiki/excel-autofilter), [도형](https://github.com/suoak/OfficeCLI/wiki/excel-shape), [OLE 객체](https://github.com/suoak/OfficeCLI/wiki/excel-ole), CSV/TSV 가져오기, `$Sheet:A1` 셀 주소 지정
 
-**PowerPoint** — [슬라이드](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-slide) (머리글/바닥글/날짜/슬라이드 번호 토글, 숨김), [도형](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-shape) (패턴 채우기, 흐림 효과, 하이퍼링크 툴팁 + 슬라이드 점프 링크), [이미지](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-picture) (PNG/JPG/GIF/SVG, 채우기 모드: stretch/contain/cover/tile, 밝기/대비/광선/그림자), [표](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-table), [차트](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-chart), [애니메이션](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-slide), [모프 전환](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-morph-check), [3D 모델 (.glb)](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-3dmodel), [슬라이드 줌](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-zoom), [수식](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-equation), [테마](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-theme), [연결선](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-connector), [비디오/오디오](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-video), [그룹](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-group), [노트](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-notes) (RTL, lang), [메모](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-comment) (RTL), [OLE 객체](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-ole), [플레이스홀더](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-placeholder) (phType로 추가/설정)
+**PowerPoint** — [슬라이드](https://github.com/suoak/OfficeCLI/wiki/ppt-slide) (머리글/바닥글/날짜/슬라이드 번호 토글, 숨김), [도형](https://github.com/suoak/OfficeCLI/wiki/ppt-shape) (패턴 채우기, 흐림 효과, 하이퍼링크 툴팁 + 슬라이드 점프 링크), [이미지](https://github.com/suoak/OfficeCLI/wiki/ppt-picture) (PNG/JPG/GIF/SVG, 채우기 모드: stretch/contain/cover/tile, 밝기/대비/광선/그림자), [표](https://github.com/suoak/OfficeCLI/wiki/ppt-table), [차트](https://github.com/suoak/OfficeCLI/wiki/ppt-chart), [애니메이션](https://github.com/suoak/OfficeCLI/wiki/ppt-slide), [모프 전환](https://github.com/suoak/OfficeCLI/wiki/ppt-morph-check), [3D 모델 (.glb)](https://github.com/suoak/OfficeCLI/wiki/ppt-3dmodel), [슬라이드 줌](https://github.com/suoak/OfficeCLI/wiki/ppt-zoom), [수식](https://github.com/suoak/OfficeCLI/wiki/ppt-equation), [테마](https://github.com/suoak/OfficeCLI/wiki/ppt-theme), [연결선](https://github.com/suoak/OfficeCLI/wiki/ppt-connector), [비디오/오디오](https://github.com/suoak/OfficeCLI/wiki/ppt-video), [그룹](https://github.com/suoak/OfficeCLI/wiki/ppt-group), [노트](https://github.com/suoak/OfficeCLI/wiki/ppt-notes) (RTL, lang), [메모](https://github.com/suoak/OfficeCLI/wiki/ppt-comment) (RTL), [OLE 객체](https://github.com/suoak/OfficeCLI/wiki/ppt-ole), [플레이스홀더](https://github.com/suoak/OfficeCLI/wiki/ppt-placeholder) (phType로 추가/설정)
 
 ## 사용 사례
 
@@ -204,10 +204,10 @@ officecli add deck.pptx / --type slide --prop title="Q4 Report"
 
 ```bash
 # macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh | bash
 
 # Windows (PowerShell)
-irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1 | iex
 ```
 
 **또는 패키지 매니저로 설치:**
@@ -223,7 +223,7 @@ scoop install officecli
 npm install -g @officecli/officecli
 ```
 
-**또는 수동 다운로드** [GitHub Releases](https://github.com/iOfficeAI/OfficeCLI/releases):
+**또는 수동 다운로드** [GitHub Releases](https://github.com/suoak/OfficeCLI/releases):
 
 | 플랫폼 | 바이너리 |
 |--------|---------|
@@ -498,28 +498,28 @@ officecli get report.docx /body --depth 1 --json
 
 | 명령어 | 설명 |
 |--------|------|
-| [`create`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-create) | 빈 .docx, .xlsx, .pptx 생성 (확장자로 유형 결정) |
-| [`view`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-view) | 콘텐츠 보기 (모드: `outline`, `text`, `annotated`, `stats`, `issues`, `html`) |
-| [`get`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-get) | 요소와 하위 요소 가져오기 (`--depth N`, `--json`) |
-| [`query`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-query) | CSS 스타일 쿼리 (`[attr=value]`, `:contains()`, `:has()` 등) |
-| [`set`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-set) | 요소 속성 수정 |
-| [`add`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-add) | 요소 추가 (또는 `--from <path>`로 복제) |
-| [`remove`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-remove) | 요소 삭제 |
-| [`move`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-move) | 요소 이동 (`--to <parent>`, `--index N`, `--after <path>`, `--before <path>`) |
-| [`swap`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-swap) | 두 요소 교체 |
-| [`validate`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-validate) | OpenXML 스키마 검증 |
-| [`batch`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-batch) | 한 번의 open/save 사이클에서 여러 작업 실행 (stdin, `--input`, 또는 `--commands`; 기본적으로 첫 오류에서 중지, `--force`로 계속) |
-| [`merge`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-merge) | 템플릿 병합 — `{{key}}` 플레이스홀더를 JSON 데이터로 교체 |
-| [`watch`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-watch) | 브라우저에서 라이브 HTML 미리보기, 자동 새로고침 |
-| [`mcp`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-mcp) | AI 도구 통합용 MCP 서버 시작 |
-| [`raw`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-raw) | 문서 파트의 원시 XML 보기 |
-| [`raw-set`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-raw) | XPath로 원시 XML 수정 |
+| [`create`](https://github.com/suoak/OfficeCLI/wiki/command-create) | 빈 .docx, .xlsx, .pptx 생성 (확장자로 유형 결정) |
+| [`view`](https://github.com/suoak/OfficeCLI/wiki/command-view) | 콘텐츠 보기 (모드: `outline`, `text`, `annotated`, `stats`, `issues`, `html`) |
+| [`get`](https://github.com/suoak/OfficeCLI/wiki/command-get) | 요소와 하위 요소 가져오기 (`--depth N`, `--json`) |
+| [`query`](https://github.com/suoak/OfficeCLI/wiki/command-query) | CSS 스타일 쿼리 (`[attr=value]`, `:contains()`, `:has()` 등) |
+| [`set`](https://github.com/suoak/OfficeCLI/wiki/command-set) | 요소 속성 수정 |
+| [`add`](https://github.com/suoak/OfficeCLI/wiki/command-add) | 요소 추가 (또는 `--from <path>`로 복제) |
+| [`remove`](https://github.com/suoak/OfficeCLI/wiki/command-remove) | 요소 삭제 |
+| [`move`](https://github.com/suoak/OfficeCLI/wiki/command-move) | 요소 이동 (`--to <parent>`, `--index N`, `--after <path>`, `--before <path>`) |
+| [`swap`](https://github.com/suoak/OfficeCLI/wiki/command-swap) | 두 요소 교체 |
+| [`validate`](https://github.com/suoak/OfficeCLI/wiki/command-validate) | OpenXML 스키마 검증 |
+| [`batch`](https://github.com/suoak/OfficeCLI/wiki/command-batch) | 한 번의 open/save 사이클에서 여러 작업 실행 (stdin, `--input`, 또는 `--commands`; 기본적으로 첫 오류에서 중지, `--force`로 계속) |
+| [`merge`](https://github.com/suoak/OfficeCLI/wiki/command-merge) | 템플릿 병합 — `{{key}}` 플레이스홀더를 JSON 데이터로 교체 |
+| [`watch`](https://github.com/suoak/OfficeCLI/wiki/command-watch) | 브라우저에서 라이브 HTML 미리보기, 자동 새로고침 |
+| [`mcp`](https://github.com/suoak/OfficeCLI/wiki/command-mcp) | AI 도구 통합용 MCP 서버 시작 |
+| [`raw`](https://github.com/suoak/OfficeCLI/wiki/command-raw) | 문서 파트의 원시 XML 보기 |
+| [`raw-set`](https://github.com/suoak/OfficeCLI/wiki/command-raw) | XPath로 원시 XML 수정 |
 | `add-part` | 새 문서 파트 추가 (머리글, 차트 등) |
-| [`open`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-open) | 레지던트 모드 시작 (문서를 메모리에 유지) |
+| [`open`](https://github.com/suoak/OfficeCLI/wiki/command-open) | 레지던트 모드 시작 (문서를 메모리에 유지) |
 | `close` | 저장하고 레지던트 모드 종료 |
-| [`install`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-install) | 바이너리 + 스킬 + MCP 설치 (`all`, `claude`, `cursor` 등) |
+| [`install`](https://github.com/suoak/OfficeCLI/wiki/command-install) | 바이너리 + 스킬 + MCP 설치 (`all`, `claude`, `cursor` 등) |
 | `config` | 설정 가져오기 또는 변경 |
-| `help <format> <command>` | [내장 도움말](https://github.com/iOfficeAI/OfficeCLI/wiki/command-reference) (예: `officecli help pptx set shape`) |
+| `help <format> <command>` | [내장 도움말](https://github.com/suoak/OfficeCLI/wiki/command-reference) (예: `officecli help pptx set shape`) |
 
 ## 엔드투엔드 워크플로우 예시
 
@@ -598,12 +598,12 @@ print(slide["attributes"]["text"])
 
 ## 문서
 
-[Wiki](https://github.com/iOfficeAI/OfficeCLI/wiki)에서 모든 명령어, 요소 유형, 속성의 상세 가이드를 확인하세요:
+[Wiki](https://github.com/suoak/OfficeCLI/wiki)에서 모든 명령어, 요소 유형, 속성의 상세 가이드를 확인하세요:
 
-- **형식별:** [Word](https://github.com/iOfficeAI/OfficeCLI/wiki/word-reference) | [Excel](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-reference) | [PowerPoint](https://github.com/iOfficeAI/OfficeCLI/wiki/powerpoint-reference)
-- **워크플로우:** [엔드투엔드 예시](https://github.com/iOfficeAI/OfficeCLI/wiki/workflows) -- Word 보고서, Excel 대시보드, PPT 프레젠테이션, 일괄 수정, 레지던트 모드
-- **문제 해결:** [자주 발생하는 오류와 해결책](https://github.com/iOfficeAI/OfficeCLI/wiki/troubleshooting)
-- **AI 에이전트 가이드:** [Wiki 내비게이션 결정 트리](https://github.com/iOfficeAI/OfficeCLI/wiki/agent-guide)
+- **형식별:** [Word](https://github.com/suoak/OfficeCLI/wiki/word-reference) | [Excel](https://github.com/suoak/OfficeCLI/wiki/excel-reference) | [PowerPoint](https://github.com/suoak/OfficeCLI/wiki/powerpoint-reference)
+- **워크플로우:** [엔드투엔드 예시](https://github.com/suoak/OfficeCLI/wiki/workflows) -- Word 보고서, Excel 대시보드, PPT 프레젠테이션, 일괄 수정, 레지던트 모드
+- **문제 해결:** [자주 발생하는 오류와 해결책](https://github.com/suoak/OfficeCLI/wiki/troubleshooting)
+- **AI 에이전트 가이드:** [Wiki 내비게이션 결정 트리](https://github.com/suoak/OfficeCLI/wiki/agent-guide)
 
 ## 소스에서 빌드
 
@@ -617,13 +617,13 @@ print(slide["attributes"]["text"])
 
 [Apache License 2.0](LICENSE)
 
-버그 리포트와 기여는 [GitHub Issues](https://github.com/iOfficeAI/OfficeCLI/issues)로 환영합니다.
+버그 리포트와 기여는 [GitHub Issues](https://github.com/suoak/OfficeCLI/issues)로 환영합니다.
 
 ---
 
-OfficeCLI가 유용하다면 [GitHub에서 스타를 눌러주세요](https://github.com/iOfficeAI/OfficeCLI) — 더 많은 사람들이 프로젝트를 발견하는 데 도움이 됩니다.
+OfficeCLI가 유용하다면 [GitHub에서 스타를 눌러주세요](https://github.com/suoak/OfficeCLI) — 더 많은 사람들이 프로젝트를 발견하는 데 도움이 됩니다.
 
-[OfficeCLI.AI](https://OfficeCLI.AI) | [GitHub](https://github.com/iOfficeAI/OfficeCLI)
+[OfficeCLI.AI](https://OfficeCLI.AI) | [GitHub](https://github.com/suoak/OfficeCLI)
 
 <!--
 yaml-frontmatter:
@@ -637,8 +637,8 @@ yaml-frontmatter:
   ai-agent-compatible: true
   mcp-server: true
   skill-file: SKILL.md
-  install-command-unix: curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-  install-command-windows: irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
+  install-command-unix: curl -fsSL https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh | bash
+  install-command-windows: irm https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1 | iex
 -->
 
 <!-- LLM/agent discovery metadata
@@ -655,6 +655,6 @@ ai-agent-compatible: true
 mcp-server: true
 skill-file: SKILL.md
 alternatives: python-docx, openpyxl, python-pptx, libreoffice --headless
-install-command-unix: curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-install-command-windows: irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
+install-command-unix: curl -fsSL https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh | bash
+install-command-windows: irm https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1 | iex
 -->

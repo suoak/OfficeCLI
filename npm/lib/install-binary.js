@@ -14,7 +14,7 @@ const https = require('https');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
 
-const REPO = 'iOfficeAI/OfficeCLI';
+const REPO = 'suoak/OfficeCLI';
 const MIRROR_BASE = 'https://d.officecli.ai';
 const GITHUB_BASE = 'https://github.com/' + REPO;
 

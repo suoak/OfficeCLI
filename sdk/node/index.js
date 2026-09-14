@@ -65,9 +65,9 @@ const OPEN_IDLE_SECONDS = 12 * 60;
 // Cloudflare-fronted and reachable where raw.githubusercontent.com may be
 // rate-limited or blocked.
 const INSTALL_SH_MIRROR = 'https://d.officecli.ai/install.sh';
-const INSTALL_SH_GITHUB = 'https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh';
+const INSTALL_SH_GITHUB = 'https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh';
 const INSTALL_PS1_MIRROR = 'https://d.officecli.ai/install.ps1';
-const INSTALL_PS1_GITHUB = 'https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1';
+const INSTALL_PS1_GITHUB = 'https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1';
 const MISSING_CLI =
   "officecli CLI not found: {bin} is not on PATH nor in the default install " +
   'location (~/.local/bin, or %LOCALAPPDATA%\\OfficeCLI on Windows). This SDK only ' +
