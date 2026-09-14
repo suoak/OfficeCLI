@@ -193,7 +193,7 @@ with officecli.create(FILE, "--force") as doc:
     items.append(cell("Data/A7", value="type=string on a numeric value", type="string"))
     items.append(cell("Data/B7", value="007", type="string"))
 
-    items.append(cell("Data/A9", value="OfficeCLI on GitHub", link="https://github.com/iOfficeAI/OfficeCLI",
+    items.append(cell("Data/A9", value="OfficeCLI on GitHub", link="https://github.com/suoak/OfficeCLI",
                       tooltip="Open the repo", underline="single", **{"font.color": "0563C1"}))
 
     items.append(cell("Data/A11", value="locked cell (effective when sheet is protected)", locked="true"))

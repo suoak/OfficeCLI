@@ -24,7 +24,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://officecli.ai"
-Repository = "https://github.com/iOfficeAI/OfficeCLI"
+Repository = "https://github.com/suoak/OfficeCLI"
 
 # IMPORTANT: this package is only the SDK. It shells out to the `officecli`
 # CLI binary, which must be installed separately and on PATH (Homebrew, etc.).

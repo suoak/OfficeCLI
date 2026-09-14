@@ -30,6 +30,6 @@ officecli --help
 - Set `OFFICECLI_SKIP_BINARY_DOWNLOAD=1` to skip the download during
   `npm install` (the binary is then fetched on first run).
 - Source, issues and full docs:
-  <https://github.com/iOfficeAI/OfficeCLI>
+  <https://github.com/suoak/OfficeCLI>
 
 Licensed under Apache-2.0.

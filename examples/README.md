@@ -353,4 +353,4 @@ Verbs: `add`, `set`, `get`, `query`, `remove`.
 
 **Happy automating! 🚀**
 
-For questions or issues, visit [GitHub Issues](https://github.com/iOfficeAI/OfficeCLI/issues).
+For questions or issues, visit [GitHub Issues](https://github.com/suoak/OfficeCLI/issues).

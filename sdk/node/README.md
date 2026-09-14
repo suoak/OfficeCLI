@@ -1,6 +1,6 @@
 # @officecli/sdk
 
-A thin **async** Node.js client over [officecli](https://github.com/iOfficeAI/OfficeCLI)'s
+A thin **async** Node.js client over [officecli](https://github.com/suoak/OfficeCLI)'s
 resident pipe. It does one thing: forward a command to the running resident and
 hand back the response. There is no second vocabulary to learn — a command is the
 same object you'd put in an officecli `batch` list.

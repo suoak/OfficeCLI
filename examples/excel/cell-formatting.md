@@ -105,7 +105,7 @@ with that `numberformat` applied:
 officecli set file.xlsx /Data/B5 --prop formula="B3*B4" --prop numberformat="$#,##0.00"   # 12 × 4.50 = $54.00
 officecli set file.xlsx /Data/B7 --prop value=007 --prop type=string                       # keep leading zeros
 officecli set file.xlsx /Data/A9 --prop value="OfficeCLI on GitHub" \
-  --prop link="https://github.com/iOfficeAI/OfficeCLI" --prop tooltip="Open the repo"
+  --prop link="https://github.com/suoak/OfficeCLI" --prop tooltip="Open the repo"
 officecli set file.xlsx /Data/A11 --prop value="locked cell" --prop locked=true            # effective once sheet is protected
 officecli set file.xlsx /Data/A13 --prop value="Merged title" --prop merge="A13:C13" \
   --prop alignment.horizontal=center

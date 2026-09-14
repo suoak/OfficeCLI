@@ -8,7 +8,7 @@
 
 **OfficeCLI 的内置 HTML 渲染引擎，高度还原文档原貌 —— 这正是让 AI 拥有"眼睛"的关键。** 它把 `.docx` / `.xlsx` / `.pptx` 渲染为 HTML 或 PNG，闭合"渲染 → 看 → 改"的循环。
 
-[![GitHub Release](https://img.shields.io/github/v/release/iOfficeAI/OfficeCLI)](https://github.com/iOfficeAI/OfficeCLI/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/suoak/OfficeCLI)](https://github.com/suoak/OfficeCLI/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 [English](README.md) | **中文** | [日本語](README_ja.md) | [한국어](README_ko.md)
@@ -76,7 +76,7 @@ curl -fsSL https://officecli.ai/SKILL.md
 
 **方式 A — 图形界面：** 安装 [**CSBU WorkMate**](https://github.com/suoak/AionUi) — 一款桌面应用，用自然语言就能创建和编辑 Office 文档，底层由 OfficeCLI 驱动。只需描述你想要什么，CSBU WorkMate 帮你搞定。
 
-**方式 B — 命令行：** 从 [GitHub Releases](https://github.com/iOfficeAI/OfficeCLI/releases) 下载对应平台的二进制文件，然后运行：
+**方式 B — 命令行：** 从 [GitHub Releases](https://github.com/suoak/OfficeCLI/releases) 下载对应平台的二进制文件，然后运行：
 
 ```bash
 officecli install
@@ -88,8 +88,8 @@ officecli install
 
 ```bash
 # 1. 安装（macOS / Linux）— 也可以：brew install officecli / npm install -g @officecli/officecli
-curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-# Windows (PowerShell): irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
+curl -fsSL https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh | bash
+# Windows (PowerShell): irm https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1 | iex
 
 # 2. 创建一个空白 PowerPoint
 officecli create deck.pptx
@@ -173,11 +173,11 @@ officecli add deck.pptx / --type slide --prop title="Q4 Report"
 | Excel (.xlsx) | ✅ | ✅ | ✅ |
 | PowerPoint (.pptx) | ✅ | ✅ | ✅ |
 
-**Word** — 完整的 [i18n 与 RTL 支持](https://github.com/iOfficeAI/OfficeCLI/wiki/i18n)（按脚本字体槽位、按脚本 BCP-47 语言标签 `lang.latin/ea/cs`、复杂脚本粗体/斜体/字号、`direction=rtl` 在段落/文本片段/节/表格/样式/页眉/页脚/docDefaults 间级联、`rtlGutter` + `pgBorders` 简写、印地语/阿拉伯语/泰语/中日韩本地化页码）、[段落](https://github.com/iOfficeAI/OfficeCLI/wiki/word-paragraph)、[文本片段](https://github.com/iOfficeAI/OfficeCLI/wiki/word-run)、[表格](https://github.com/iOfficeAI/OfficeCLI/wiki/word-table)、[样式](https://github.com/iOfficeAI/OfficeCLI/wiki/word-style)、[页眉/页脚](https://github.com/iOfficeAI/OfficeCLI/wiki/word-header-footer)、[图片](https://github.com/iOfficeAI/OfficeCLI/wiki/word-picture)（PNG/JPG/GIF/SVG）、[公式](https://github.com/iOfficeAI/OfficeCLI/wiki/word-equation)、[批注](https://github.com/iOfficeAI/OfficeCLI/wiki/word-comment)、[脚注](https://github.com/iOfficeAI/OfficeCLI/wiki/word-footnote)、[水印](https://github.com/iOfficeAI/OfficeCLI/wiki/word-watermark)、[书签](https://github.com/iOfficeAI/OfficeCLI/wiki/word-bookmark)、[目录](https://github.com/iOfficeAI/OfficeCLI/wiki/word-toc)、[图表](https://github.com/iOfficeAI/OfficeCLI/wiki/word-chart)、[超链接](https://github.com/iOfficeAI/OfficeCLI/wiki/word-hyperlink)、[节](https://github.com/iOfficeAI/OfficeCLI/wiki/word-section)、[表单域](https://github.com/iOfficeAI/OfficeCLI/wiki/word-formfield)、[内容控件 (SDT)](https://github.com/iOfficeAI/OfficeCLI/wiki/word-sdt)、[域](https://github.com/iOfficeAI/OfficeCLI/wiki/word-field)（22 种零参数 + MERGEFIELD / REF / PAGEREF / SEQ / STYLEREF / DOCPROPERTY / IF）、[OLE 对象](https://github.com/iOfficeAI/OfficeCLI/wiki/word-ole)、[文档属性](https://github.com/iOfficeAI/OfficeCLI/wiki/word-document)
+**Word** — 完整的 [i18n 与 RTL 支持](https://github.com/suoak/OfficeCLI/wiki/i18n)（按脚本字体槽位、按脚本 BCP-47 语言标签 `lang.latin/ea/cs`、复杂脚本粗体/斜体/字号、`direction=rtl` 在段落/文本片段/节/表格/样式/页眉/页脚/docDefaults 间级联、`rtlGutter` + `pgBorders` 简写、印地语/阿拉伯语/泰语/中日韩本地化页码）、[段落](https://github.com/suoak/OfficeCLI/wiki/word-paragraph)、[文本片段](https://github.com/suoak/OfficeCLI/wiki/word-run)、[表格](https://github.com/suoak/OfficeCLI/wiki/word-table)、[样式](https://github.com/suoak/OfficeCLI/wiki/word-style)、[页眉/页脚](https://github.com/suoak/OfficeCLI/wiki/word-header-footer)、[图片](https://github.com/suoak/OfficeCLI/wiki/word-picture)（PNG/JPG/GIF/SVG）、[公式](https://github.com/suoak/OfficeCLI/wiki/word-equation)、[批注](https://github.com/suoak/OfficeCLI/wiki/word-comment)、[脚注](https://github.com/suoak/OfficeCLI/wiki/word-footnote)、[水印](https://github.com/suoak/OfficeCLI/wiki/word-watermark)、[书签](https://github.com/suoak/OfficeCLI/wiki/word-bookmark)、[目录](https://github.com/suoak/OfficeCLI/wiki/word-toc)、[图表](https://github.com/suoak/OfficeCLI/wiki/word-chart)、[超链接](https://github.com/suoak/OfficeCLI/wiki/word-hyperlink)、[节](https://github.com/suoak/OfficeCLI/wiki/word-section)、[表单域](https://github.com/suoak/OfficeCLI/wiki/word-formfield)、[内容控件 (SDT)](https://github.com/suoak/OfficeCLI/wiki/word-sdt)、[域](https://github.com/suoak/OfficeCLI/wiki/word-field)（22 种零参数 + MERGEFIELD / REF / PAGEREF / SEQ / STYLEREF / DOCPROPERTY / IF）、[OLE 对象](https://github.com/suoak/OfficeCLI/wiki/word-ole)、[文档属性](https://github.com/suoak/OfficeCLI/wiki/word-document)
 
-**Excel** — [单元格](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-cell)（添加时支持音标/振假名）、公式（内置 350+ 函数自动求值，可溢出的动态数组自动加 `_xlfn.` 前缀，含财务/债券与统计函数族）、[工作表](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-sheet)（visible/hidden/veryHidden、打印边距、printTitleRows/Cols、RTL `sheetView`、级联感知的工作表重命名）、[表格](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-table)、[排序](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-sort)（工作表/区域、多键、附属感知）、[条件格式](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-conditionalformatting)、[图表](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-chart)（含箱线图、[帕累托图](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-chart-add) 自动排序 + 累计百分比、对数轴）、[数据透视表](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-pivottable)（多字段、日期分组、showDataAs、排序、总计、分类汇总、紧凑/大纲/表格布局、重复项目标签、空白行、计算字段）、[切片器](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-slicer)、[命名范围](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-namedrange)、[数据验证](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-validation)、[图片](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-picture)（PNG/JPG/GIF/SVG，双重表示回退）、[迷你图](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-sparkline)、[批注](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-comment)（RTL）、[自动筛选](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-autofilter)、[形状](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-shape)、[OLE 对象](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-ole)、CSV/TSV 导入、`$Sheet:A1` 单元格寻址
+**Excel** — [单元格](https://github.com/suoak/OfficeCLI/wiki/excel-cell)（添加时支持音标/振假名）、公式（内置 350+ 函数自动求值，可溢出的动态数组自动加 `_xlfn.` 前缀，含财务/债券与统计函数族）、[工作表](https://github.com/suoak/OfficeCLI/wiki/excel-sheet)（visible/hidden/veryHidden、打印边距、printTitleRows/Cols、RTL `sheetView`、级联感知的工作表重命名）、[表格](https://github.com/suoak/OfficeCLI/wiki/excel-table)、[排序](https://github.com/suoak/OfficeCLI/wiki/excel-sort)（工作表/区域、多键、附属感知）、[条件格式](https://github.com/suoak/OfficeCLI/wiki/excel-conditionalformatting)、[图表](https://github.com/suoak/OfficeCLI/wiki/excel-chart)（含箱线图、[帕累托图](https://github.com/suoak/OfficeCLI/wiki/excel-chart-add) 自动排序 + 累计百分比、对数轴）、[数据透视表](https://github.com/suoak/OfficeCLI/wiki/excel-pivottable)（多字段、日期分组、showDataAs、排序、总计、分类汇总、紧凑/大纲/表格布局、重复项目标签、空白行、计算字段）、[切片器](https://github.com/suoak/OfficeCLI/wiki/excel-slicer)、[命名范围](https://github.com/suoak/OfficeCLI/wiki/excel-namedrange)、[数据验证](https://github.com/suoak/OfficeCLI/wiki/excel-validation)、[图片](https://github.com/suoak/OfficeCLI/wiki/excel-picture)（PNG/JPG/GIF/SVG，双重表示回退）、[迷你图](https://github.com/suoak/OfficeCLI/wiki/excel-sparkline)、[批注](https://github.com/suoak/OfficeCLI/wiki/excel-comment)（RTL）、[自动筛选](https://github.com/suoak/OfficeCLI/wiki/excel-autofilter)、[形状](https://github.com/suoak/OfficeCLI/wiki/excel-shape)、[OLE 对象](https://github.com/suoak/OfficeCLI/wiki/excel-ole)、CSV/TSV 导入、`$Sheet:A1` 单元格寻址
 
-**PowerPoint** — [幻灯片](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-slide)（页眉/页脚/日期/页码切换、隐藏）、[形状](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-shape)（图案填充、模糊效果、超链接提示 + 跳转幻灯片链接）、[图片](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-picture)（PNG/JPG/GIF/SVG，填充模式：stretch/contain/cover/tile，亮度/对比度/发光/阴影）、[表格](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-table)、[图表](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-chart)、[动画](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-slide)、[morph 过渡](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-morph-check)、[3D 模型（.glb）](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-3dmodel)、[幻灯片缩放](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-zoom)、[公式](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-equation)、[主题](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-theme)、[连接线](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-connector)、[视频/音频](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-video)、[组合](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-group)、[备注](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-notes)（RTL、lang）、[批注](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-comment)（RTL）、[OLE 对象](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-ole)、[占位符](https://github.com/iOfficeAI/OfficeCLI/wiki/ppt-placeholder)（按 phType 添加/设置）
+**PowerPoint** — [幻灯片](https://github.com/suoak/OfficeCLI/wiki/ppt-slide)（页眉/页脚/日期/页码切换、隐藏）、[形状](https://github.com/suoak/OfficeCLI/wiki/ppt-shape)（图案填充、模糊效果、超链接提示 + 跳转幻灯片链接）、[图片](https://github.com/suoak/OfficeCLI/wiki/ppt-picture)（PNG/JPG/GIF/SVG，填充模式：stretch/contain/cover/tile，亮度/对比度/发光/阴影）、[表格](https://github.com/suoak/OfficeCLI/wiki/ppt-table)、[图表](https://github.com/suoak/OfficeCLI/wiki/ppt-chart)、[动画](https://github.com/suoak/OfficeCLI/wiki/ppt-slide)、[morph 过渡](https://github.com/suoak/OfficeCLI/wiki/ppt-morph-check)、[3D 模型（.glb）](https://github.com/suoak/OfficeCLI/wiki/ppt-3dmodel)、[幻灯片缩放](https://github.com/suoak/OfficeCLI/wiki/ppt-zoom)、[公式](https://github.com/suoak/OfficeCLI/wiki/ppt-equation)、[主题](https://github.com/suoak/OfficeCLI/wiki/ppt-theme)、[连接线](https://github.com/suoak/OfficeCLI/wiki/ppt-connector)、[视频/音频](https://github.com/suoak/OfficeCLI/wiki/ppt-video)、[组合](https://github.com/suoak/OfficeCLI/wiki/ppt-group)、[备注](https://github.com/suoak/OfficeCLI/wiki/ppt-notes)（RTL、lang）、[批注](https://github.com/suoak/OfficeCLI/wiki/ppt-comment)（RTL）、[OLE 对象](https://github.com/suoak/OfficeCLI/wiki/ppt-ole)、[占位符](https://github.com/suoak/OfficeCLI/wiki/ppt-placeholder)（按 phType 添加/设置）
 
 ## 使用场景
 
@@ -204,10 +204,10 @@ officecli add deck.pptx / --type slide --prop title="Q4 Report"
 
 ```bash
 # macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh | bash
 
 # Windows (PowerShell)
-irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1 | iex
 ```
 
 **或通过包管理器安装：**
@@ -223,7 +223,7 @@ scoop install officecli
 npm install -g @officecli/officecli
 ```
 
-**或手动下载** [GitHub Releases](https://github.com/iOfficeAI/OfficeCLI/releases)：
+**或手动下载** [GitHub Releases](https://github.com/suoak/OfficeCLI/releases)：
 
 | 平台 | 文件名 |
 |------|--------|
@@ -333,7 +333,7 @@ officecli batch deck.pptx --input updates.json --stop-on-error --json
 > officecli save report.docx           # 落盘, 保留常驻进程(或 `close` = 落盘 + 释放)
 > python my_reader.py report.docx      # 此时才能看到改动
 > ```
-> 常驻进程闲置约 10s 后也会自动落盘一次。完整落盘模型(auto-save / auto-close / save / close、环境变量调节):[wiki → open / close](https://github.com/iOfficeAI/OfficeCLI/wiki/command-open#when-the-file-on-disk-is-refreshed)。
+> 常驻进程闲置约 10s 后也会自动落盘一次。完整落盘模型(auto-save / auto-close / save / close、环境变量调节):[wiki → open / close](https://github.com/suoak/OfficeCLI/wiki/command-open#when-the-file-on-disk-is-refreshed)。
 
 ### 三层架构
 
@@ -510,28 +510,28 @@ officecli get report.docx /body --depth 1 --json
 
 | 命令 | 说明 |
 |------|------|
-| [`create`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-create) | 创建空白 .docx、.xlsx 或 .pptx（根据扩展名判断类型） |
-| [`view`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-view) | 查看内容（模式：`outline`、`text`、`annotated`、`stats`、`issues`、`html`） |
-| [`get`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-get) | 获取元素及子元素（`--depth N`、`--json`） |
-| [`query`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-query) | CSS 风格查询（`[attr=value]`、`:contains()`、`:has()` 等） |
-| [`set`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-set) | 修改元素属性 |
-| [`add`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-add) | 添加元素（或通过 `--from <path>` 克隆） |
-| [`remove`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-remove) | 删除元素 |
-| [`move`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-move) | 移动元素（`--to <parent>`、`--index N`、`--after <path>`、`--before <path>`） |
-| [`swap`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-swap) | 交换两个元素 |
-| [`validate`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-validate) | OpenXML 模式校验 |
-| [`batch`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-batch) | 单次打开/保存周期内执行多条操作（stdin、`--input` 或 `--commands`；默认原子化——只要有一条失败整批回滚，`--best-effort` 保留已成功部分，`--stop-on-error` 提前中止） |
-| [`merge`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-merge) | 模板合并 — 用 JSON 数据替换 `{{key}}` 占位符 |
-| [`watch`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-watch) | 在浏览器中实时 HTML 预览，自动刷新 |
-| [`mcp`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-mcp) | 启动 MCP 服务器，用于 AI 工具集成 |
-| [`raw`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-raw) | 查看文档部件的原始 XML |
-| [`raw-set`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-raw) | 通过 XPath 修改原始 XML |
+| [`create`](https://github.com/suoak/OfficeCLI/wiki/command-create) | 创建空白 .docx、.xlsx 或 .pptx（根据扩展名判断类型） |
+| [`view`](https://github.com/suoak/OfficeCLI/wiki/command-view) | 查看内容（模式：`outline`、`text`、`annotated`、`stats`、`issues`、`html`） |
+| [`get`](https://github.com/suoak/OfficeCLI/wiki/command-get) | 获取元素及子元素（`--depth N`、`--json`） |
+| [`query`](https://github.com/suoak/OfficeCLI/wiki/command-query) | CSS 风格查询（`[attr=value]`、`:contains()`、`:has()` 等） |
+| [`set`](https://github.com/suoak/OfficeCLI/wiki/command-set) | 修改元素属性 |
+| [`add`](https://github.com/suoak/OfficeCLI/wiki/command-add) | 添加元素（或通过 `--from <path>` 克隆） |
+| [`remove`](https://github.com/suoak/OfficeCLI/wiki/command-remove) | 删除元素 |
+| [`move`](https://github.com/suoak/OfficeCLI/wiki/command-move) | 移动元素（`--to <parent>`、`--index N`、`--after <path>`、`--before <path>`） |
+| [`swap`](https://github.com/suoak/OfficeCLI/wiki/command-swap) | 交换两个元素 |
+| [`validate`](https://github.com/suoak/OfficeCLI/wiki/command-validate) | OpenXML 模式校验 |
+| [`batch`](https://github.com/suoak/OfficeCLI/wiki/command-batch) | 单次打开/保存周期内执行多条操作（stdin、`--input` 或 `--commands`；默认原子化——只要有一条失败整批回滚，`--best-effort` 保留已成功部分，`--stop-on-error` 提前中止） |
+| [`merge`](https://github.com/suoak/OfficeCLI/wiki/command-merge) | 模板合并 — 用 JSON 数据替换 `{{key}}` 占位符 |
+| [`watch`](https://github.com/suoak/OfficeCLI/wiki/command-watch) | 在浏览器中实时 HTML 预览，自动刷新 |
+| [`mcp`](https://github.com/suoak/OfficeCLI/wiki/command-mcp) | 启动 MCP 服务器，用于 AI 工具集成 |
+| [`raw`](https://github.com/suoak/OfficeCLI/wiki/command-raw) | 查看文档部件的原始 XML |
+| [`raw-set`](https://github.com/suoak/OfficeCLI/wiki/command-raw) | 通过 XPath 修改原始 XML |
 | `add-part` | 添加新的文档部件（页眉、图表等） |
-| [`open`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-open) | 启动驻留模式（文档保持在内存中） |
+| [`open`](https://github.com/suoak/OfficeCLI/wiki/command-open) | 启动驻留模式（文档保持在内存中） |
 | `close` | 保存并关闭驻留模式 |
-| [`install`](https://github.com/iOfficeAI/OfficeCLI/wiki/command-install) | 安装二进制文件 + 技能文件 + MCP（`all`、`claude`、`cursor` 等） |
+| [`install`](https://github.com/suoak/OfficeCLI/wiki/command-install) | 安装二进制文件 + 技能文件 + MCP（`all`、`claude`、`cursor` 等） |
 | `config` | 获取或设置配置 |
-| `help <format> <command>` | [内置帮助](https://github.com/iOfficeAI/OfficeCLI/wiki/command-reference)（如 `officecli help pptx set shape`） |
+| `help <format> <command>` | [内置帮助](https://github.com/suoak/OfficeCLI/wiki/command-reference)（如 `officecli help pptx set shape`） |
 
 ## 端到端工作流示例
 
@@ -610,12 +610,12 @@ print(slide["attributes"]["text"])
 
 ## 文档
 
-[Wiki](https://github.com/iOfficeAI/OfficeCLI/wiki) 提供了每个命令、元素类型和属性的详细指南：
+[Wiki](https://github.com/suoak/OfficeCLI/wiki) 提供了每个命令、元素类型和属性的详细指南：
 
-- **按格式查看：**[Word](https://github.com/iOfficeAI/OfficeCLI/wiki/word-reference) | [Excel](https://github.com/iOfficeAI/OfficeCLI/wiki/excel-reference) | [PowerPoint](https://github.com/iOfficeAI/OfficeCLI/wiki/powerpoint-reference)
-- **工作流：**[端到端示例](https://github.com/iOfficeAI/OfficeCLI/wiki/workflows) -- Word 报告、Excel 数据表、PPT 演示、批量修改、驻留模式
-- **故障排除：**[常见错误与解决方案](https://github.com/iOfficeAI/OfficeCLI/wiki/troubleshooting)
-- **AI 智能体指南：**[Wiki 导航决策树](https://github.com/iOfficeAI/OfficeCLI/wiki/agent-guide)
+- **按格式查看：**[Word](https://github.com/suoak/OfficeCLI/wiki/word-reference) | [Excel](https://github.com/suoak/OfficeCLI/wiki/excel-reference) | [PowerPoint](https://github.com/suoak/OfficeCLI/wiki/powerpoint-reference)
+- **工作流：**[端到端示例](https://github.com/suoak/OfficeCLI/wiki/workflows) -- Word 报告、Excel 数据表、PPT 演示、批量修改、驻留模式
+- **故障排除：**[常见错误与解决方案](https://github.com/suoak/OfficeCLI/wiki/troubleshooting)
+- **AI 智能体指南：**[Wiki 导航决策树](https://github.com/suoak/OfficeCLI/wiki/agent-guide)
 
 ## 从源码构建
 
@@ -629,13 +629,13 @@ print(slide["attributes"]["text"])
 
 [Apache License 2.0](LICENSE)
 
-欢迎通过 [GitHub Issues](https://github.com/iOfficeAI/OfficeCLI/issues) 提交 Bug 报告和贡献代码。
+欢迎通过 [GitHub Issues](https://github.com/suoak/OfficeCLI/issues) 提交 Bug 报告和贡献代码。
 
 ---
 
-如果觉得 OfficeCLI 好用，请在 [GitHub 上点个 Star](https://github.com/iOfficeAI/OfficeCLI) — 帮助更多人发现这个项目。
+如果觉得 OfficeCLI 好用，请在 [GitHub 上点个 Star](https://github.com/suoak/OfficeCLI) — 帮助更多人发现这个项目。
 
-[OfficeCLI.AI](https://OfficeCLI.AI) | [GitHub](https://github.com/iOfficeAI/OfficeCLI)
+[OfficeCLI.AI](https://OfficeCLI.AI) | [GitHub](https://github.com/suoak/OfficeCLI)
 
 <!--
 yaml-frontmatter:
@@ -649,8 +649,8 @@ yaml-frontmatter:
   ai-agent-compatible: true
   mcp-server: true
   skill-file: SKILL.md
-  install-command-unix: curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-  install-command-windows: irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
+  install-command-unix: curl -fsSL https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh | bash
+  install-command-windows: irm https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1 | iex
 -->
 
 <!-- LLM/agent discovery metadata
@@ -667,6 +667,6 @@ ai-agent-compatible: true
 mcp-server: true
 skill-file: SKILL.md
 alternatives: python-docx, openpyxl, python-pptx, libreoffice --headless
-install-command-unix: curl -fsSL https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.sh | bash
-install-command-windows: irm https://raw.githubusercontent.com/iOfficeAI/OfficeCLI/main/install.ps1 | iex
+install-command-unix: curl -fsSL https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh | bash
+install-command-windows: irm https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1 | iex
 -->

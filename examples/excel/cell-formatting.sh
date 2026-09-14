@@ -155,7 +155,7 @@ $CLI set "$FILE" /Data/B5 --prop formula="B3*B4" --prop numberformat='$#,##0.00'
 $CLI set "$FILE" /Data/A7 --prop value="type=string on a numeric value" --prop type=string
 $CLI set "$FILE" /Data/B7 --prop value=007 --prop type=string
 
-$CLI set "$FILE" /Data/A9 --prop value="OfficeCLI on GitHub" --prop link="https://github.com/iOfficeAI/OfficeCLI" --prop tooltip="Open the repo" --prop underline=single --prop font.color=0563C1
+$CLI set "$FILE" /Data/A9 --prop value="OfficeCLI on GitHub" --prop link="https://github.com/suoak/OfficeCLI" --prop tooltip="Open the repo" --prop underline=single --prop font.color=0563C1
 
 $CLI set "$FILE" /Data/A11 --prop value="locked cell (effective when sheet is protected)" --prop locked=true
 
