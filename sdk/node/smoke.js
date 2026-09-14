@@ -7,9 +7,9 @@ const os = require('os');
 const path = require('path');
 const fs = require('fs');
 const oc = require('./index.js');
+const f = path.join(os.tmpdir(), `officecli-smoke-${process.pid}.xlsx`);
 
 (async () => {
-  const f = path.join(os.tmpdir(), `officecli-smoke-${process.pid}.xlsx`);
   const d = await oc.create(f, ['--force']);
   await d.send({ command: 'set', path: '/Sheet1/A1', props: { text: 'smoke-ok' } });
   const g = await d.send({ command: 'get', path: '/Sheet1/A1' });
@@ -22,5 +22,8 @@ const oc = require('./index.js');
   console.log('node SDK smoke PASS');
 })().catch((e) => {
   console.error('node SDK smoke THREW:', (e && e.message) || e);
+  console.error('node SDK smoke file:', f, 'exists=', fs.existsSync(f));
+  if (fs.existsSync(f)) console.error('node SDK smoke realpath:', fs.realpathSync.native(f));
+  console.error('node SDK smoke pipes:', oc.pipePaths(f));
   process.exit(1);
 });
