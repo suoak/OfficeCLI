@@ -457,10 +457,20 @@ class Document {
     this._restarting = null; // in-flight dead-resident restart (serializes callers)
   }
 
-  async _start() {
+  async _waitForServing(readinessMs) {
+    const deadline = Date.now() + readinessMs;
+    while (Date.now() < deadline) {
+      if (await serves(this._ping, this.path, 250)) return true;
+      await sleep(50);
+    }
+    return false;
+  }
+
+  async _start(existingGraceMs = 0) {
     // Reuse a resident already serving this file (no spawn). serves() is a real
     // liveness probe (ping + path match), so a stale/dead socket falls through
     // to `officecli open`, which replaces it via TryConnect.
+    if (existingGraceMs > 0 && await this._waitForServing(existingGraceMs)) return;
     if (await serves(this._ping, this.path)) return;
     const r = runCli(this.bin, ['open', this.path]);
     if (r.status !== 0) throw new OfficeCliError(r.status == null ? -1 : r.status, r.stderr || r.stdout);
@@ -470,11 +480,7 @@ class Document {
     // which surfaces as ENOENT on macOS runners. Wait on the dedicated ping
     // pipe so the first real command is sent only after the resident is ready.
     const readinessMs = Math.max(1000, Math.min(this.timeout, 10000));
-    const deadline = Date.now() + readinessMs;
-    while (Date.now() < deadline) {
-      if (await serves(this._ping, this.path, 250)) return;
-      await sleep(50);
-    }
+    if (await this._waitForServing(readinessMs)) return;
     throw new OfficeCliError(-1, `resident did not become ready within ${readinessMs}ms`);
   }
 
@@ -590,7 +596,9 @@ async function create(filePath, args = [], { binary = 'officecli', timeoutMs = 3
   const r = runCli(bin, ['create', full, ...args]);
   if (r.status !== 0) throw new OfficeCliError(r.status == null ? -1 : r.status, r.stderr || r.stdout);
   const doc = new Document(full, bin, timeoutMs);
-  await doc._start(); // create auto-started a resident; this finds it alive (no extra spawn)
+  // Give the resident auto-started by `create` time to bind before falling back
+  // to `open`; immediately starting a second owner can race the first process.
+  await doc._start(5000);
   return doc;
 }
 

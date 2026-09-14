@@ -373,7 +373,8 @@ def _run_cli(binary, argv):
 
 # ---------------------------------------------------------------- the shell
 class Document:
-    def __init__(self, path, binary="officecli", timeout=30.0):
+    def __init__(self, path, binary="officecli", timeout=30.0,
+                 _existing_grace=0.0):
         # Canonical (Windows 8.3-expanded) so the pipe name AND the _serves()
         # path comparison both match what the resident reports.
         self.path = _canonical_path(path)
@@ -381,9 +382,17 @@ class Document:
         self.timeout = timeout          # connect timeout (s); the reply read blocks
         self._main, self._ping = pipe_paths(self.path)
         self._restart_lock = threading.Lock()   # serialize dead-resident restarts
-        self._start()
+        self._start(_existing_grace)
 
-    def _start(self):
+    def _wait_for_serving(self, readiness):
+        deadline = time.monotonic() + readiness
+        while time.monotonic() < deadline:
+            if _serves(self._ping, self.path, timeout=0.25):
+                return True
+            time.sleep(0.05)
+        return False
+
+    def _start(self, existing_grace=0.0):
         # If a resident is ALREADY serving this file, reuse it — no process spawn.
         # Mirrors officecli, where a command after `create` reuses the resident
         # `create` auto-started instead of re-running `open`. _serves() is a real
@@ -391,6 +400,8 @@ class Document:
         # socket-file-exists check, so a stale/dead socket fails the probe and
         # falls through to `officecli open`, which replaces it via TryConnect.
         # (A plain os.path.exists() here would wrongly skip on a stale socket.)
+        if existing_grace > 0 and self._wait_for_serving(existing_grace):
+            return
         if _serves(self._ping, self.path):
             return
         # Otherwise spawn `officecli open` (one process). It's idempotent and uses
@@ -404,11 +415,8 @@ class Document:
         # which surfaces as ENOENT on macOS runners. Wait on the dedicated ping
         # pipe before allowing the first real command through.
         readiness = max(1.0, min(self.timeout, 10.0))
-        deadline = time.monotonic() + readiness
-        while time.monotonic() < deadline:
-            if _serves(self._ping, self.path, timeout=0.25):
-                return
-            time.sleep(0.05)
+        if self._wait_for_serving(readiness):
+            return
         raise OfficeCliError(-1,
             f"resident did not become ready within {readiness:.1f}s")
 
@@ -556,9 +564,9 @@ def create(path, *args, binary="officecli", timeout=30.0, auto_install=True):
     r = _run_cli(binary, ["create", full, *args])
     if r.returncode != 0:
         raise OfficeCliError(r.returncode, r.stderr or r.stdout)
-    # create auto-started a resident for the new file; bind a handle to it
-    # (Document.__init__ -> _start -> _serves finds it alive, so no extra spawn).
-    return Document(full, binary=binary, timeout=timeout)
+    # Give the resident auto-started by `create` time to bind before falling back
+    # to `open`; immediately starting a second owner can race the first process.
+    return Document(full, binary=binary, timeout=timeout, _existing_grace=5.0)
 
 
 def open(path, binary="officecli", timeout=30.0, auto_install=True):
