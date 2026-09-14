@@ -60,20 +60,18 @@ const BUSY_MAX_RETRIES = 3;            // = ResidentBusyMaxRetries
 // interactive window, so a long session over an SDK handle isn't cut short.
 const OPEN_IDLE_SECONDS = 12 * 60;
 
-// Installer scripts: the d.officecli.ai mirror is primary; GitHub raw is only a
-// fallback (same order as install.sh / install-binary.js). The mirror is
-// Cloudflare-fronted and reachable where raw.githubusercontent.com may be
-// rate-limited or blocked.
-const INSTALL_SH_MIRROR = 'https://d.officecli.ai/install.sh';
-const INSTALL_SH_GITHUB = 'https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh';
-const INSTALL_PS1_MIRROR = 'https://d.officecli.ai/install.ps1';
-const INSTALL_PS1_GITHUB = 'https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1';
+// Prefer the independently maintained suoak release scripts. The legacy mirror
+// remains a fallback for networks where raw.githubusercontent.com is blocked.
+const INSTALL_SH_PRIMARY = 'https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.sh';
+const INSTALL_SH_FALLBACK = 'https://d.officecli.ai/install.sh';
+const INSTALL_PS1_PRIMARY = 'https://raw.githubusercontent.com/suoak/OfficeCLI/main/install.ps1';
+const INSTALL_PS1_FALLBACK = 'https://d.officecli.ai/install.ps1';
 const MISSING_CLI =
   "officecli CLI not found: {bin} is not on PATH nor in the default install " +
   'location (~/.local/bin, or %LOCALAPPDATA%\\OfficeCLI on Windows). This SDK only ' +
   'forwards commands to the officecli binary, which must be installed separately. Install it:\n' +
   '    node -e "require(\'@officecli/sdk\').install()"   # runs the official installer\n' +
-  '    # or: curl -fsSL ' + INSTALL_SH_MIRROR + ' | bash\n' +
+  '    # or: curl -fsSL ' + INSTALL_SH_PRIMARY + ' | bash\n' +
   '    # (npm i @officecli/sdk already pulls @officecli/officecli, which bundles the binary)\n' +
   'Already installed elsewhere? pass { binary: "/path/to/officecli" }.';
 
@@ -376,7 +374,7 @@ async function ensureCliBinary(binary, autoInstall) {
 
   // Nothing usable found anywhere — provision it (only for the default name).
   if (autoInstall && binary === 'officecli') {
-    process.stderr.write('[officecli] CLI not found — installing from d.officecli.ai …\n');
+    process.stderr.write('[officecli] CLI not found — installing from suoak/OfficeCLI …\n');
     try {
       const cli = require('@officecli/officecli');
       await cli.ensureBinary(); // bundled package's own signed download
@@ -613,30 +611,29 @@ async function open(filePath, { binary = 'officecli', timeoutMs = 30000, autoIns
  */
 function install() {
   if (IS_WIN) {
-    process.stderr.write(`Installing officecli via ${INSTALL_PS1_MIRROR} (github fallback) ...\n`);
-    // Fetch the script mirror-first, github fallback, then run it. The whole
-    // try/catch is assigned so a mirror failure transparently falls back.
-    const ps = `$s = try { irm '${INSTALL_PS1_MIRROR}' } catch { irm '${INSTALL_PS1_GITHUB}' }; $s | iex`;
+    process.stderr.write(`Installing officecli via ${INSTALL_PS1_PRIMARY} (mirror fallback) ...\n`);
+    // Fetch the autonomous release script first, then fall back to the mirror.
+    const ps = `$s = try { irm '${INSTALL_PS1_PRIMARY}' } catch { irm '${INSTALL_PS1_FALLBACK}' }; $s | iex`;
     const r = spawnSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', ps], {
       stdio: 'inherit',
     });
     if (r.status !== 0) {
       throw new OfficeCliError(
         r.status == null ? -1 : r.status,
-        `officecli install failed. Run manually:\n    irm ${INSTALL_PS1_MIRROR} | iex`
+        `officecli install failed. Run manually:\n    irm ${INSTALL_PS1_PRIMARY} | iex`
       );
     }
     return;
   }
-  process.stderr.write(`Installing officecli via ${INSTALL_SH_MIRROR} (github fallback) ...\n`);
-  // (curl mirror || curl github) | bash — the subshell emits whichever script
+  process.stderr.write(`Installing officecli via ${INSTALL_SH_PRIMARY} (mirror fallback) ...\n`);
+  // (curl github || curl mirror) | bash — the subshell emits whichever script
   // fetch succeeds; the group keeps the pipe bound to the whole fallback.
-  const sh = `(curl -fsSL ${INSTALL_SH_MIRROR} 2>/dev/null || curl -fsSL ${INSTALL_SH_GITHUB}) | bash`;
+  const sh = `(curl -fsSL ${INSTALL_SH_PRIMARY} 2>/dev/null || curl -fsSL ${INSTALL_SH_FALLBACK}) | bash`;
   const r = spawnSync('bash', ['-c', sh], { stdio: 'inherit' });
   if (r.status !== 0) {
     throw new OfficeCliError(
       r.status == null ? -1 : r.status,
-      `officecli install failed. Run manually:\n    curl -fsSL ${INSTALL_SH_MIRROR} | bash`
+      `officecli install failed. Run manually:\n    curl -fsSL ${INSTALL_SH_PRIMARY} | bash`
     );
   }
 }
