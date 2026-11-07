@@ -942,7 +942,9 @@ public partial class ExcelHandler
             // non-numeric content survive the round-trip. Without this, a
             // value like "00456" gets written as <x:v>00456</x:v> with no
             // t="str" and Excel reparses it as 456 on open.
-            if (IsTextNumberFormat(cellStyleProps)
+            // WorkMate adaptation: a format-only edit must preserve the existing
+            // value type; coerce storage only when this operation also writes a value.
+            if (IsTextNumberFormat(cellStyleProps) && properties.ContainsKey("value")
                 && cell.DataType?.Value != CellValues.SharedString
                 && cell.DataType?.Value != CellValues.InlineString
                 && cell.CellFormula == null)

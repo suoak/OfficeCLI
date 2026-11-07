@@ -746,7 +746,8 @@ public partial class ExcelHandler
 
             // R24-1: numberformat="@" → force text storage. See ExcelHandler.Add.Cells.cs
             // for the matching guard on the Add path.
-            if (IsTextNumberFormat(styleProps)
+            // WorkMate adaptation: formatting alone must not rewrite stored data types.
+            if (IsTextNumberFormat(styleProps) && (properties.ContainsKey("value") || properties.ContainsKey("text"))
                 && cell.DataType?.Value != CellValues.SharedString
                 && cell.DataType?.Value != CellValues.InlineString
                 && cell.CellFormula == null)
