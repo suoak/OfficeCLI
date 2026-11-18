@@ -251,7 +251,34 @@ RequireOfficialSchema(cancelJson, "CancelledNotification");
     }
     Require(hanging.HasExited, "production runner left the parent process running after cancel");
     foreach (var childPid in childPids)
-        Require(!Directory.Exists($"/proc/{childPid}"), $"child process {childPid} survived tree kill");
+    {
+        // A SIGKILLed grandchild is reparented and stays in /proc as a zombie
+        // until its new parent reaps it; on some runners that takes a moment.
+        // Dead (gone) or zombie (state Z/X) both mean the kill worked.
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        string? state = ProcState(childPid);
+        while (state is not null && state is not ("Z" or "X") && DateTime.UtcNow < deadline)
+        {
+            await Task.Delay(50);
+            state = ProcState(childPid);
+        }
+        Require(state is null or "Z" or "X", $"child process {childPid} survived tree kill (state {state})");
+    }
+}
+
+static string? ProcState(int pid)
+{
+    try
+    {
+        var stat = File.ReadAllText($"/proc/{pid}/stat");
+        // Format: pid (comm) state ...; comm may contain spaces/parens.
+        var close = stat.LastIndexOf(')');
+        return close < 0 ? "?" : stat[(close + 2)..].Split(' ', 2)[0];
+    }
+    catch (Exception e) when (e is FileNotFoundException or DirectoryNotFoundException or IOException)
+    {
+        return null;
+    }
 }
 
 Console.WriteLine("MCP contract tests passed.");
